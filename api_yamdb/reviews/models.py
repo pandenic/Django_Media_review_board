@@ -1,5 +1,6 @@
-from django.db import models
+"""Модуль содержит описание моделей для приложения review."""
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 
 class User(AbstractUser):
