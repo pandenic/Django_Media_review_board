@@ -3,8 +3,9 @@ from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 
 from reviews.models import Title
-from .serializers import TitleSerializer
-from .filters import TitleFilter
+from api.serializers import TitleViewSerializer
+from api.filters import TitleFilter
+from api.permissions import IsAdminOrReadOnly
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -12,7 +13,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     Доступна фильтрация по полям."""
 
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
+    serializer_class = TitleViewSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
-    # TODO: permission_classes
+    permission_classes = (IsAdminOrReadOnly,)
