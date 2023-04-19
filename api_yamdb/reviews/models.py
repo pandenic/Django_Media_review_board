@@ -4,7 +4,6 @@ from django.core.validators import (
     MinValueValidator
 )
 
-
 class Review(models.Model):
     """Модель отзывов на произведения."""
     text = models.CharField(
@@ -61,7 +60,7 @@ class Comment(models.Model):
     text = models.CharField(
         max_length=256,
         verbose_name='Текст комментария',
-        help_text='Текст комментария к отзыву'
+        help_text='Текст комментария к отзывам'
     )
     author = models.ForeignKey(
         User,
