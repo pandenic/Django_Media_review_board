@@ -7,7 +7,7 @@ class CustomUserRouter(SimpleRouter):
 
     routes = [
         Route(
-            url=r"^{prefix}/$",
+            url=r"^{prefix}{trailing_slash}$",
             mapping={
                 "get": "list",
                 "post": "create",
@@ -17,7 +17,7 @@ class CustomUserRouter(SimpleRouter):
             initkwargs={"suffix": "List"}
         ),
         Route(
-            url=r"^{prefix}/{lookup}/$",
+            url=r"^{prefix}/{lookup}{trailing_slash}$",
             mapping={
                 "get": "retrieve",
                 "patch": "update",
@@ -28,7 +28,7 @@ class CustomUserRouter(SimpleRouter):
             initkwargs={"suffix": "Detail"}
         ),
         DynamicRoute(
-            url=r"^{prefix}/{url_path}/$",
+            url=r"^{prefix}/{url_path}{trailing_slash}$",
             name="{basename}-{url_name}",
             detail=True,
             initkwargs={}
