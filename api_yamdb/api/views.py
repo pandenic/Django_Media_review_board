@@ -1,8 +1,10 @@
+"""Модуль содержит view для приложения api."""
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
-from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
 
+from rest_framework import permissions, serializers, status, viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework import viewsets, status, serializers, permissions
@@ -13,6 +15,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from api.filters import TitleFilter
 from api.mixins import ListCreateDestroyViewSet
 from api.pagination import UserPagination
+from api.serializers import (GetTokenSerializer, SignupSerializer,
+                             UserSerializer)
 from api.permissions import IsAdminOrReadOnly
 from api.serializers import (
     CategorySerializer,
@@ -36,6 +40,7 @@ class UserViewSet(viewsets.ModelViewSet):
     pagination_class = UserPagination
     lookup_field = "username"
 
+    @action(["get", "patch"], detail=False)
     def me(self, request):
         """Функция для обработки 'users/me' endpoint."""
         if request.method == "PATCH":
@@ -104,8 +109,8 @@ def get_token(request):
         user = get_object_or_404(User, username=username)
 
         if not default_token_generator.check_token(
-                user,
-                serializer.validated_data["confirmation_code"],
+            user,
+            serializer.validated_data["confirmation_code"],
         ):
             raise serializers.ValidationError("Invalid confirmation code")
 
@@ -130,9 +135,9 @@ def sign_up(request):
         )
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
-            'yamdb код подтверждения',
-            f'Код подтверждения: {confirmation_code}',
-            'yamdb@yamdb.com',
+            "yamdb код подтверждения",
+            f"Код подтверждения: {confirmation_code}",
+            "yamdb@yamdb.com",
             [user.email],
             fail_silently=False,
         )

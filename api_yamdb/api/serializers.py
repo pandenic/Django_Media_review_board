@@ -16,7 +16,14 @@ class UserSerializer(serializers.ModelSerializer):
         """Metaclass of PostSerializer contains model link and fields tuple."""
 
         model = User
-        fields = ("username", "email", "first_name", "last_name", "bio", "role")
+        fields = (
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "bio",
+            "role",
+        )
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -93,14 +100,20 @@ class SignupSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         """Проверяет входные данные при сериализации регистрации."""
-        username = attrs['username']
-        email = attrs['email']
+        username = attrs["username"]
+        email = attrs["email"]
         if username == "me":
-            raise serializers.ValidationError("Нельзя использовать me в качестве имени пользователя")
+            raise serializers.ValidationError(
+                "Нельзя использовать me в качестве имени пользователя",
+            )
         user_list = User.objects.filter(username=username)
         if user_list.exists() and user_list[0].email != email:
-            raise serializers.ValidationError("Нельзя использовать существующеe имя пользователя")
+            raise serializers.ValidationError(
+                "Нельзя использовать существующеe имя пользователя",
+            )
         user_list = User.objects.filter(email=email)
         if user_list.exists() and user_list[0].username != username:
-            raise serializers.ValidationError("Нельзя использовать email существующего пользователя")
+            raise serializers.ValidationError(
+                "Нельзя использовать email существующего пользователя",
+            )
         return attrs

@@ -36,6 +36,4 @@ v1 = [
     path("auth/signup/", sign_up, name="sign_up"),
 ]
 
-urlpatterns = [
-    path("v1/", include(v1))
-]
+urlpatterns = [path("v1/", include(v1))]

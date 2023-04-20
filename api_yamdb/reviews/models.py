@@ -33,8 +33,10 @@ class User(AbstractUser):
 
 
 class Category(models.Model):
-    """Модель описывает категории произведений и
-    включает поля name и slug."""
+    """Модель описывает категории произведений.
+
+    Включает поля name и slug.
+    """
 
     name = models.CharField(
         verbose_name="Название категории",
@@ -52,13 +54,17 @@ class Category(models.Model):
     )
 
     class Meta:
+        """Определяет настройки модели Category."""
+
         verbose_name = "Категория"
         verbose_name_plural = "Категории"
 
 
 class Genre(models.Model):
-    """Модель описывает жанры произведений и
-    включает поля name и slug."""
+    """Модель описывает жанры произведений.
+
+    Включает поля name и slug.
+    """
 
     name = models.CharField(
         verbose_name="Название жанра",
@@ -76,6 +82,8 @@ class Genre(models.Model):
     )
 
     class Meta:
+        """Определяет настройки модели Genre."""
+
         verbose_name = "Жанр"
         verbose_name_plural = "Жанры"
 
@@ -120,16 +128,21 @@ class Title(models.Model):
     )
 
     class Meta:
+        """Определяет настройки модели Title."""
+
         verbose_name = "Произведение"
         verbose_name_plural = "Произведения"
 
     def __str__(self):
+        """Определяет отображение модели Title."""
         return self.name
 
 
 class GenreTitle(models.Model):
-    """Промежуточная модель для связи ManytoMany
-    между произведением и жанром."""
+    """Промежуточная модель для связи ManytoMany.
+
+    Между произведением и жанром.
+    """
 
     title = models.ForeignKey(
         Title,
@@ -145,10 +158,13 @@ class GenreTitle(models.Model):
     )
 
     class Meta:
+        """Определяет настройки модели GenreTitle."""
+
         verbose_name = "Произведение и жанр"
         verbose_name_plural = "Произведения и жанры"
 
     def __str__(self):
+        """Определяет отображение модели GenreTitle."""
         return f"{self.title}, {self.genre}"
 
 
