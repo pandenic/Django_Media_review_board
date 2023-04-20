@@ -1,5 +1,5 @@
 """Модуль, в котором содержатся url для приложения api."""
-from django.urls import path, include
+from django.urls import include, path
 
 from api.routers import CustomUserRouter
 from api.views import UserViewSet, get_token, sign_up
@@ -17,6 +17,4 @@ v1 = [
     path("auth/signup/", sign_up, name="sign_up"),
 ]
 
-urlpatterns = [
-    path("v1/", include(v1))
-]
+urlpatterns = [path("v1/", include(v1))]

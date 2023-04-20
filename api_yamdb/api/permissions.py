@@ -1,38 +1,59 @@
+"""Модуль содержит определения permissions для приложения api."""
 from rest_framework import permissions
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
+    """Ограничмвает использование 'опасных' запросов.
+
+    Для всех кроме админа.
+    """
+
     def has_permission(self, request, view):
-        return (request.method in permissions.SAFE_METHODS
-                or (request.user.is_authenticated
-                    and request.user.is_admin)
-                )
+        """Проверяет запрос на соответствие ограничениям."""
+        return request.method in permissions.SAFE_METHODS or (
+            request.user.is_authenticated and request.user.is_admin
+        )
 
 
 class IsAuthorOrStaffOrReadOnly(permissions.BasePermission):
+    """Ограничмвает использование 'опасных' запросов.
+
+    Для всех кроме модератора и админа.
+    """
+
     def has_object_permission(self, request, view, obj):
-        return (request.method in permissions.SAFE_METHODS
-                or obj.author == request.user
-                or request.user.is_moderator
-                or request.user.is_admin)
+        """Проверяет доступ к объекту на соответствие ограничениям."""
+        return (
+            request.method in permissions.SAFE_METHODS
+            or obj.author == request.user
+            or request.user.is_moderator
+            or request.user.is_admin
+        )
 
 
 class AdminOnly(permissions.BasePermission):
+    """Ограничмвает использование любых запросов.
+
+    Для всех кроме модератора и админа.
+    """
+
     def has_permission(self, request, view):
-        return (
-            request.user.is_admin
-            or request.user.is_staff
-        )
+        """Проверяет запрос на соответствие ограничениям."""
+        return request.user.is_admin or request.user.is_staff
 
     def has_object_permission(self, request, view, obj):
-        return (
-            request.user.is_admin
-            or request.user.is_staff
-        )
+        """Проверяет доступ к объекту на соответствие ограничениям."""
+        return request.user.is_admin or request.user.is_staff
 
 
 class IsAdminUserOrReadOnly(permissions.BasePermission):
+    """Ограничмвает использование 'опасных' запросов.
+
+    Для всех кроме любого аутентифицированного пользователя.
+    """
+
     def has_permission(self, request, view):
+        """Проверяет запрос на соответствие ограничениям."""
         if request.method in permissions.SAFE_METHODS:
             return True
         if request.user.is_authenticated:

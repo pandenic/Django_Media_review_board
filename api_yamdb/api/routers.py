@@ -1,9 +1,9 @@
 """Модуль описывает классы роутеров."""
-
-from rest_framework.routers import Route, DynamicRoute, SimpleRouter
+from rest_framework.routers import DynamicRoute, Route, SimpleRouter
 
 
 class CustomUserRouter(SimpleRouter):
+    """Описывает endpoints, которые создаёт router."""
 
     routes = [
         Route(
@@ -14,7 +14,7 @@ class CustomUserRouter(SimpleRouter):
             },
             name="{basename}-list",
             detail=False,
-            initkwargs={"suffix": "List"}
+            initkwargs={"suffix": "List"},
         ),
         Route(
             url=r"^{prefix}/{lookup}{trailing_slash}$",
@@ -25,12 +25,12 @@ class CustomUserRouter(SimpleRouter):
             },
             name="{basename}-detail",
             detail=True,
-            initkwargs={"suffix": "Detail"}
+            initkwargs={"suffix": "Detail"},
         ),
         DynamicRoute(
             url=r"^{prefix}/{url_path}{trailing_slash}$",
             name="{basename}-{url_name}",
-            detail=True,
-            initkwargs={}
+            detail=False,
+            initkwargs={},
         ),
     ]

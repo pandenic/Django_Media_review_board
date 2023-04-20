@@ -1,18 +1,17 @@
-import uuid
-
+"""Модуль содержит view для приложения api."""
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
-from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
 
-from rest_framework import viewsets, status, serializers, permissions
+from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-
 from api.pagination import UserPagination
-from api.serializers import UserSerializer, GetTokenSerializer, SignupSerializer
+from api.serializers import (GetTokenSerializer, SignupSerializer,
+                             UserSerializer)
 
 User = get_user_model()
 
@@ -25,6 +24,7 @@ class UserViewSet(viewsets.ModelViewSet):
     pagination_class = UserPagination
     lookup_field = "username"
 
+    @action(["get", "patch"], detail=False)
     def me(self, request):
         """Функция для обработки 'users/me' endpoint."""
         if request.method == "PATCH":
@@ -54,8 +54,8 @@ def get_token(request):
         user = get_object_or_404(User, username=username)
 
         if not default_token_generator.check_token(
-                user,
-                serializer.validated_data["confirmation_code"],
+            user,
+            serializer.validated_data["confirmation_code"],
         ):
             raise serializers.ValidationError("Invalid confirmation code")
 
@@ -80,12 +80,11 @@ def sign_up(request):
         )
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
-            'yamdb код подтверждения',
-            f'Код подтверждения: {confirmation_code}',
-            'yamdb@yamdb.com',
+            "yamdb код подтверждения",
+            f"Код подтверждения: {confirmation_code}",
+            "yamdb@yamdb.com",
             [user.email],
             fail_silently=False,
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
-

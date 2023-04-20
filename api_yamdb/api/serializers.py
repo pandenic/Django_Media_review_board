@@ -1,10 +1,7 @@
 """Модуль содержит описание serializers для приложения api."""
 from django.contrib.auth import get_user_model
-from django.contrib.auth.tokens import default_token_generator
-from django.shortcuts import get_object_or_404
 
 from rest_framework import serializers
-
 
 User = get_user_model()
 
@@ -16,7 +13,14 @@ class UserSerializer(serializers.ModelSerializer):
         """Metaclass of PostSerializer contains model link and fields tuple."""
 
         model = User
-        fields = ("username", "email", "first_name", "last_name", "bio", "role")
+        fields = (
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "bio",
+            "role",
+        )
 
 
 class GetTokenSerializer(serializers.Serializer):
@@ -34,14 +38,20 @@ class SignupSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         """Проверяет входные данные при сериализации регистрации."""
-        username = attrs['username']
-        email = attrs['email']
+        username = attrs["username"]
+        email = attrs["email"]
         if username == "me":
-            raise serializers.ValidationError("Нельзя использовать me в качестве имени пользователя")
+            raise serializers.ValidationError(
+                "Нельзя использовать me в качестве имени пользователя",
+            )
         user_list = User.objects.filter(username=username)
         if user_list.exists() and user_list[0].email != email:
-            raise serializers.ValidationError("Нельзя использовать существующеe имя пользователя")
+            raise serializers.ValidationError(
+                "Нельзя использовать существующеe имя пользователя",
+            )
         user_list = User.objects.filter(email=email)
         if user_list.exists() and user_list[0].username != username:
-            raise serializers.ValidationError("Нельзя использовать email существующего пользователя")
+            raise serializers.ValidationError(
+                "Нельзя использовать email существующего пользователя",
+            )
         return attrs
