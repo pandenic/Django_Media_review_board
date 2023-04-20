@@ -4,6 +4,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 
+from rest_framework import permissions, serializers, status, viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework import viewsets, status, serializers, permissions
@@ -14,6 +15,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from api.filters import TitleFilter
 from api.mixins import ListCreateDestroyViewSet
 from api.pagination import UserPagination
+from api.serializers import (GetTokenSerializer, SignupSerializer,
+                             UserSerializer)
 from api.permissions import IsAdminOrReadOnly
 from api.serializers import (
     CategorySerializer,
