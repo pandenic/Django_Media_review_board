@@ -152,36 +152,6 @@ class GenreTitle(models.Model):
         return f"{self.title}, {self.genre}"
 
 
-class Comment(models.Model):
-    """Модель комментариев к отзывам."""
-
-    text = models.CharField(
-        max_length=256,
-        verbose_name='Текст комментария',
-        help_text='Текст комментария к отзывам'
-    )
-    author = models.ForeignKey(
-        User,
-        related_name='comments',
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-        verbose_name='Автор комментария'
-    )
-    created = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Дата комментария'
-    )
-
-    class Meta:
-        verbose_name = 'Комментарий',
-        verbose_name_plural = 'Комментарии',
-        ordering = ('-created',)
-
-    def __str__(self) -> str:
-        return self.text[:15]
-
-
 class Review(models.Model):
     """Модель отзывов на произведения."""
     
@@ -229,6 +199,41 @@ class Review(models.Model):
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
         ordering = ('pub_date',)
+
+    def __str__(self) -> str:
+        return self.text[:15]
+
+
+class Comment(models.Model):
+    """Модель комментариев к отзывам."""
+
+    text = models.CharField(
+        max_length=256,
+        verbose_name='Текст комментария',
+        help_text='Текст комментария к отзывам'
+    )
+    author = models.ForeignKey(
+        User,
+        related_name='comments',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        verbose_name='Автор комментария'
+    )
+    reviews = models.ForeignKey(
+        Review,
+        related_name='comments',
+        on_delete=models.CASCADE,
+    )
+    created = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата комментария'
+    )
+
+    class Meta:
+        verbose_name = 'Комментарий',
+        verbose_name_plural = 'Комментарии',
+        ordering = ('-created',)
 
     def __str__(self) -> str:
         return self.text[:15]
