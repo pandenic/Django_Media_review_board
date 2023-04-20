@@ -1,4 +1,5 @@
 """Модуль содержит описание моделей для приложения review."""
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import (
     MaxValueValidator,
@@ -157,51 +158,51 @@ class Review(models.Model):
     
     text = models.CharField(
         max_length=256,
-        verbose_name='Текст отзыва',
-        help_text = 'Введите текст отзыва'
+        verbose_name="Текст отзыва",
+        help_text = "Введите текст отзыва"
         )
     author = models.ForeignKey(
         User,
-        related_name='reviewer',
+        related_name="reviewer",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
-        verbose_name='Автор отзыва'
+        verbose_name="Автор отзыва"
     )
     title = models.ForeignKey(
         Title,
-        related_name='reviews',
+        related_name="reviews",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
-        verbose_name='Произведение'
+        verbose_name="Произведение"
     )
     score = models.PositiveIntegerField(
-        verbose_name='Оценка',
-        help_text='Укажите оценку от 1 до 10',
+        verbose_name="Оценка",
+        help_text="Укажите оценку от 1 до 10",
         validators=[
             MinValueValidator(
                 1,
-                message='Оценка ниже допустимой!'
+                message="Оценка ниже допустимой!"
             ),
             MaxValueValidator(
                 10,
-                message='Оценка выше допустимой!'
+                message="Оценка выше допустимой!"
             ),
         ],
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
-        verbose_name='Дата публикации отзыва'
+        verbose_name="Дата публикации отзыва"
     )
 
     class Meta:
-        verbose_name = 'Отзыв'
-        verbose_name_plural = 'Отзывы'
-        ordering = ('pub_date',)
+        verbose_name = "Отзыв"
+        verbose_name_plural = "Отзывы"
+        ordering = ("pub_date",)
 
     def __str__(self) -> str:
-        return self.text[:15]
+        return self.text[:settings.TEXT_LENGTH]
 
 
 class Comment(models.Model):
@@ -209,31 +210,31 @@ class Comment(models.Model):
 
     text = models.CharField(
         max_length=256,
-        verbose_name='Текст комментария',
-        help_text='Текст комментария к отзывам'
+        verbose_name="Текст комментария",
+        help_text="Текст комментария к отзывам"
     )
     author = models.ForeignKey(
         User,
-        related_name='comments',
+        related_name="comments",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
-        verbose_name='Автор комментария'
+        verbose_name="Автор комментария"
     )
     reviews = models.ForeignKey(
         Review,
-        related_name='comments',
+        related_name="comments",
         on_delete=models.CASCADE,
     )
     created = models.DateTimeField(
         auto_now_add=True,
-        verbose_name='Дата комментария'
+        verbose_name="Дата комментария"
     )
 
     class Meta:
-        verbose_name = 'Комментарий',
-        verbose_name_plural = 'Комментарии',
-        ordering = ('-created',)
+        verbose_name = "Комментарий"
+        verbose_name_plural = "Комментарии"
+        ordering = ("-created",)
 
     def __str__(self) -> str:
-        return self.text[:15]
+        return self.text[:settings.TEXT_LENGTH]

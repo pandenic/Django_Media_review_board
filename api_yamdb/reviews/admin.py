@@ -43,19 +43,19 @@ class TitleAdmin(admin.ModelAdmin):
     list_filter = ("year", "genre", "category")
 
 
-class CommenAdmin(admin.ModelAdmin):
+class CommentAdmin(admin.ModelAdmin):
     """
     Настройки админ-панели для комментариев.
     """
     
     list_display = (
-        'id',
-        'text',
-        'author',
-        'created',
+        "id",
+        "text",
+        "author",
+        "created",
     )
-    search_fields = ('text', 'author',)
-    list_filter = ('text', 'author', 'created',)
+    search_fields = ("text", "author",)
+    list_filter = ("text", "author", "created",)
 
 
 class ReviewAdmin(admin.ModelAdmin):
@@ -64,16 +64,16 @@ class ReviewAdmin(admin.ModelAdmin):
     """
     
     list_display = (
-        'id',
-        'text',
-        'author',
-        'score',
-        'pub_date',
+        "id",
+        "text",
+        "author",
+        "score",
+        "pub_date",
     )
-    search_fields = ('text', 'author', 'pub_date',)
-    list_filter = ('text', 'author', 'pub_date',)
+    search_fields = ("text", "author", "pub_date",)
+    list_filter = ("text", "author", "pub_date",)
 
-admin.site.register(Comment, CommenAdmin)
+admin.site.register(Comment, CommentAdmin)
 admin.site.register(Review, ReviewAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(Category, CategoryAdmin)
