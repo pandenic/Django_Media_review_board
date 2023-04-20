@@ -25,7 +25,6 @@ class UserViewSet(viewsets.ModelViewSet):
     pagination_class = UserPagination
     lookup_field = "username"
 
-    @action(methods=["patch", "get"], detail=True, url_path=r"me")
     def me(self, request):
         """Функция для обработки 'users/me' endpoint."""
         if request.method == "PATCH":
@@ -74,7 +73,7 @@ def get_token(request):
 def sign_up(request):
     """Функция регистрации и получения письма с confirmation code."""
     serializer = SignupSerializer(data=request.data)
-    if serializer.is_valid():
+    if serializer.is_valid(raise_exception=True):
         user, created = User.objects.get_or_create(
             username=serializer.validated_data["username"],
             email=serializer.validated_data["email"],
