@@ -2,6 +2,7 @@
 from django.contrib import admin
 from reviews.models import Comment, Category, Genre, Review, Title, User
 
+
 class UserAdmin(admin.ModelAdmin):
     """Настройки для панели администратора модели User."""
 
@@ -44,34 +45,45 @@ class TitleAdmin(admin.ModelAdmin):
 
 
 class CommentAdmin(admin.ModelAdmin):
-    """
-    Настройки админ-панели для комментариев.
-    """
+    """Настройки админ-панели для комментариев."""
 
     list_display = (
-        'id',
-        'text',
-        'author',
-        'created',
+        "id",
+        "text",
+        "author",
+        "created",
     )
-    search_fields = ('text', 'author',)
-    list_filter = ('text', 'author', 'created',)
+    search_fields = (
+        "text",
+        "author",
+    )
+    list_filter = (
+        "text",
+        "author",
+        "created",
+    )
 
 
 class ReviewAdmin(admin.ModelAdmin):
-    """
-    Настройки админ-панели для отзывов.
-    """
+    """Настройки админ-панели для отзывов."""
 
     list_display = (
-        'id',
-        'text',
-        'author',
-        'score',
-        'pub_date',
+        "id",
+        "text",
+        "author",
+        "score",
+        "pub_date",
     )
-    search_fields = ('text', 'author', 'pub_date',)
-    list_filter = ('text', 'author', 'pub_date',)
+    search_fields = (
+        "text",
+        "author",
+        "pub_date",
+    )
+    list_filter = (
+        "text",
+        "author",
+        "pub_date",
+    )
 
 
 admin.site.register(User, UserAdmin)

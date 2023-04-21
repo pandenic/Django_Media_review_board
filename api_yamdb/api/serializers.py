@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
     """Сериализирует модель user."""
 
     class Meta:
-        """Metaclass of PostSerializer contains model link and fields tuple."""
+        """Определяет настройки сериалайзера UserSerializer."""
 
         model = User
         fields = (
@@ -30,6 +30,8 @@ class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор модели Category."""
 
     class Meta:
+        """Определяет настройки сериалайзера CategorySerializer."""
+
         model = Category
         exclude = ("id",)
 
@@ -38,6 +40,8 @@ class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор модели Genre."""
 
     class Meta:
+        """Определяет настройки сериалайзера GenreSerializer."""
+
         model = Genre
         exclude = ("id",)
 
@@ -46,21 +50,24 @@ class TitleWriteSerializer(serializers.ModelSerializer):
     """Сериализатор модели Title для записи."""
 
     genre = serializers.SlugRelatedField(
-        queryset=Genre.objects.all(), many=True, slug_field="slug"
+        queryset=Genre.objects.all(), many=True, slug_field="slug",
     )
     category = serializers.SlugRelatedField(
-        queryset=Category.objects.all(), slug_field="slug"
+        queryset=Category.objects.all(), slug_field="slug",
     )
 
     class Meta:
+        """Определяет настройки сериалайзера TitleWriteSerializer."""
+
         model = Title
         fields = ("id", "name", "year", "description", "genre", "category")
 
     def validate_year(self, data):
+        """Проверяет год при сериализации создания записи в модель Title."""
         current_year = timezone.now().year
         if data > current_year:
             raise serializers.ValidationError(
-                "Год выпуска не может быть больше текущего."
+                "Год выпуска не может быть больше текущего.",
             )
         return data
 
@@ -73,6 +80,8 @@ class TitleReadSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField(read_only=True)
 
     class Meta:
+        """Определяет настройки сериалайзера TitleReadSerializer."""
+
         model = Title
         fields = (
             "id",
