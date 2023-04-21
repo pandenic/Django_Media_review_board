@@ -1,9 +1,6 @@
 """Модуль содержит описание моделей для приложения review."""
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import (
-    MaxValueValidator,
-    MinValueValidator
-)
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from reviews.validators import validate_year
@@ -33,8 +30,10 @@ class User(AbstractUser):
 
 
 class Category(models.Model):
-    """Модель описывает категории произведений и
-    включает поля name и slug."""
+    """Модель описывает категории произведений.
+
+    Включает поля name и slug.
+    """
 
     name = models.CharField(
         verbose_name="Название категории",
@@ -52,13 +51,17 @@ class Category(models.Model):
     )
 
     class Meta:
+        """Определяет настройки модели Category."""
+
         verbose_name = "Категория"
         verbose_name_plural = "Категории"
 
 
 class Genre(models.Model):
-    """Модель описывает жанры произведений и
-    включает поля name и slug."""
+    """Модель описывает жанры произведений.
+
+    Включает поля name и slug.
+    """
 
     name = models.CharField(
         verbose_name="Название жанра",
@@ -76,6 +79,8 @@ class Genre(models.Model):
     )
 
     class Meta:
+        """Определяет настройки модели Genre."""
+
         verbose_name = "Жанр"
         verbose_name_plural = "Жанры"
 
@@ -120,16 +125,21 @@ class Title(models.Model):
     )
 
     class Meta:
+        """Определяет настройки модели Title."""
+
         verbose_name = "Произведение"
         verbose_name_plural = "Произведения"
 
     def __str__(self):
+        """Определяет отображение модели Title."""
         return self.name
 
 
 class GenreTitle(models.Model):
-    """Промежуточная модель для связи ManytoMany
-    между произведением и жанром."""
+    """Промежуточная модель для связи ManytoMany.
+
+    Между произведением и жанром.
+    """
 
     title = models.ForeignKey(
         Title,
@@ -145,62 +155,61 @@ class GenreTitle(models.Model):
     )
 
     class Meta:
+        """Определяет настройки модели GenreTitle."""
+
         verbose_name = "Произведение и жанр"
         verbose_name_plural = "Произведения и жанры"
 
     def __str__(self):
+        """Определяет отображение модели GenreTitle."""
         return f"{self.title}, {self.genre}"
 
 
 class Review(models.Model):
     """Модель отзывов на произведения."""
-    
+
     text = models.CharField(
         max_length=256,
-        verbose_name='Текст отзыва',
-        help_text = 'Введите текст отзыва'
-        )
+        verbose_name="Текст отзыва",
+        help_text="Введите текст отзыва",
+    )
     author = models.ForeignKey(
         User,
-        related_name='reviewer',
+        related_name="reviewer",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
-        verbose_name='Автор отзыва'
+        verbose_name="Автор отзыва",
     )
     title = models.ForeignKey(
         Title,
-        related_name='reviews',
+        related_name="reviews",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
-        verbose_name='Произведение'
+        verbose_name="Произведение",
     )
     score = models.PositiveIntegerField(
-        verbose_name='Оценка',
-        help_text='Укажите оценку от 1 до 10',
+        verbose_name="Оценка",
+        help_text="Укажите оценку от 1 до 10",
         validators=[
-            MinValueValidator(
-                1,
-                message='Оценка ниже допустимой!'
-            ),
-            MaxValueValidator(
-                10,
-                message='Оценка выше допустимой!'
-            ),
+            MinValueValidator(1, message="Оценка ниже допустимой!"),
+            MaxValueValidator(10, message="Оценка выше допустимой!"),
         ],
     )
     pub_date = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Дата публикации отзыва'
+        auto_now_add=True, verbose_name="Дата публикации отзыва",
     )
 
     class Meta:
-        verbose_name = 'Отзыв'
-        verbose_name_plural = 'Отзывы'
-        ordering = ('pub_date',)
+        """Определяет настройки модели Review."""
+
+        verbose_name = "Отзыв"
+        verbose_name_plural = "Отзывы"
+        ordering = ("pub_date",)
 
     def __str__(self) -> str:
+        """Определяет отображение модели Review."""
         return self.text[:15]
 
 
@@ -209,31 +218,33 @@ class Comment(models.Model):
 
     text = models.CharField(
         max_length=256,
-        verbose_name='Текст комментария',
-        help_text='Текст комментария к отзывам'
+        verbose_name="Текст комментария",
+        help_text="Текст комментария к отзывам",
     )
     author = models.ForeignKey(
         User,
-        related_name='comments',
+        related_name="comments",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
-        verbose_name='Автор комментария'
+        verbose_name="Автор комментария",
     )
     reviews = models.ForeignKey(
         Review,
-        related_name='comments',
+        related_name="comments",
         on_delete=models.CASCADE,
     )
     created = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Дата комментария'
+        auto_now_add=True, verbose_name="Дата комментария",
     )
 
     class Meta:
-        verbose_name = 'Комментарий',
-        verbose_name_plural = 'Комментарии',
-        ordering = ('-created',)
+        """Определяет настройки модели Comment."""
+
+        verbose_name = ("Комментарий",)
+        verbose_name_plural = ("Комментарии",)
+        ordering = ("-created",)
 
     def __str__(self) -> str:
+        """Определяет отображение модели Comment."""
         return self.text[:15]
