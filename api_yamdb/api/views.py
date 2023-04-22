@@ -9,11 +9,11 @@ from rest_framework.filters import SearchFilter
 from rest_framework import viewsets, status, serializers, permissions
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.filters import TitleFilter
 from api.mixins import ListCreateDestroyViewSet
-from api.pagination import UserPagination
 from api.permissions import IsAdminOrReadOnly, IsAuthorOrStaffOrReadOnly
 from api.serializers import (
     CategorySerializer,
@@ -36,7 +36,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    pagination_class = UserPagination
+    pagination_class = PageNumberPagination
     lookup_field = "username"
 
     @action(["get", "patch"], detail=False)
