@@ -1,9 +1,15 @@
 """Модуль, в котором содержатся url для приложения api."""
 from django.urls import include, path
 
-from rest_framework.routers import SimpleRouter
+from rest_framework.routers import DefaultRouter, SimpleRouter
 
-from api.views import CategoryViewSet, GenreViewSet, TitleViewSet
+from api.views import (
+    CategoryViewSet,
+    GenreViewSet,
+    TitleViewSet,
+    ReviewViewSet,
+    CommentViewSet
+    )
 from api.routers import CustomUserRouter
 from api.views import UserViewSet, get_token, sign_up
 
@@ -29,7 +35,20 @@ user_router.register(
     basename="users",
 )
 
+router_v1 = DefaultRouter()
+router_v1.register(
+    r"titles/(?P<title_id>\d+)/reviews",
+    ReviewViewSet,
+    basename="reviews"
+)
+router_v1.register(
+    r"titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments",
+    CommentViewSet,
+    basename="comments"
+)
+
 v1 = [
+    path("", include(router_v1.urls)),
     path("", include(router.urls)),
     path("", include(user_router.urls)),
     path("auth/token/", get_token, name="token_obtain"),
