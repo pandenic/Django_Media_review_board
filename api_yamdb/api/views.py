@@ -3,8 +3,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-
 from django_filters.rest_framework import DjangoFilterBackend
+
 from rest_framework.filters import SearchFilter
 from rest_framework import viewsets, status, serializers, permissions
 from rest_framework.decorators import action, api_view, permission_classes
@@ -38,6 +38,8 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     pagination_class = PageNumberPagination
     lookup_field = "username"
+    filter_backends = (SearchFilter,)
+    search_fields = ('username',)
 
     @action(["get", "patch"], detail=False)
     def me(self, request):
