@@ -229,7 +229,8 @@ class Comment(models.Model):
         null=True,
         verbose_name="Автор комментария",
     )
-    reviews = models.ForeignKey(
+    # Изменено название поля ниже
+    review = models.ForeignKey(
         Review,
         related_name="comments",
         on_delete=models.CASCADE,
