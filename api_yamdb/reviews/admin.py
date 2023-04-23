@@ -1,5 +1,6 @@
 """Модуль содержит настройки для панели администратора приложения reviews."""
 from django.contrib import admin
+
 from reviews.models import Comment, Category, Genre, Review, Title, User
 
 

@@ -14,7 +14,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.filters import TitleFilter
 from api.mixins import ListCreateDestroyViewSet
-from api.permissions import IsAdminOrReadOnly, IsAuthorOrStaffOrReadOnly, IsAdminOnly
+from api.permissions import (
+    IsAdminOrReadOnly,
+    IsAuthorOrStaffOrReadOnly,
+    IsAdminOnly,
+)
 from api.serializers import (
     CategorySerializer,
     GenreSerializer,
@@ -24,9 +28,9 @@ from api.serializers import (
     GetTokenSerializer,
     SignupSerializer,
     ReviewSerializer,
-    CommentSerializer
+    CommentSerializer,
 )
-from reviews.models import Category, Genre, Title,  Review
+from reviews.models import Category, Genre, Title, Review
 
 User = get_user_model()
 
@@ -39,9 +43,9 @@ class UserViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
     lookup_field = "username"
     filter_backends = (SearchFilter,)
-    search_fields = ('username',)
+    search_fields = ("username",)
     permission_classes = (permissions.IsAuthenticated, IsAdminOnly)
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ["get", "post", "patch", "delete"]
 
     def get_permissions(self):
         """Определяет permissions в зависимости от метода."""
@@ -155,42 +159,45 @@ def sign_up(request):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    """
-    Viewset для просмотра и редактирования Отзывов.
-    """
+    """Viewset для просмотра и редактирования Отзывов."""
 
     serializer_class = ReviewSerializer
     permission_classes = (IsAuthorOrStaffOrReadOnly,)
-    
+
     def get_title(self):
+        """Определяет функцию для получения title_id из url."""
         return Title.objects.get(pk=self.kwargs.get("title_id"))
 
     def get_queryset(self):
+        """Переопределяет queryset в зависимости от title_id."""
         return self.get_title().reviews.all()
-    
+
     def perform_create(self, serializer):
-        serializer.save(
-            author=self.request.user,
-            title=self.get_title()
-        )
+        """Переопределяет действия при создания записи.
+
+        Обновляет поля author и title произведения
+        для сохраняемой записи.
+        """
+        serializer.save(author=self.request.user, title=self.get_title())
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    """
-    Viewset для создания и редактирования комментариев.
-    """
+    """Viewset для создания и редактирования комментариев."""
 
     serializer_class = CommentSerializer
     permission_classes = (IsAuthorOrStaffOrReadOnly,)
 
     def get_review(self):
+        """Определяет функцию для получения review_id из url."""
         return Review.objects.get(pk=self.kwargs.get("review_id"))
 
     def get_queryset(self):
+        """Переопределяет queryset в зависимости от review_id."""
         return self.get_review().comments.all()
 
     def perform_create(self, serializer):
-        serializer.save(
-            author=self.request.user,
-            pk=self.get_review()
-        )
+        """Переопределяет действия при создания записи.
+
+        Обновляет поля author и pk review для сохраняемой записи.
+        """
+        serializer.save(author=self.request.user, pk=self.get_review())

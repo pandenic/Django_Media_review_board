@@ -21,11 +21,7 @@ router.register(
     TitleViewSet,
     basename="titles",
 )
-router.register(
-    "categories",
-    CategoryViewSet,
-    basename="categories"
-)
+router.register("categories", CategoryViewSet, basename="categories")
 router.register(
     "genres",
     GenreViewSet,
@@ -38,13 +34,12 @@ router.register(
 )
 router.register(
     r"titles/(?P<title_id>\d+)/reviews",
-    ReviewViewSet,
-    basename="reviews"
+    ReviewViewSet, basename="reviews",
 )
 router.register(
     r"titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments",
     CommentViewSet,
-    basename="comments"
+    basename="comments",
 )
 
 v1 = [

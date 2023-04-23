@@ -57,10 +57,13 @@ class TitleWriteSerializer(serializers.ModelSerializer):
     """Сериализатор модели Title для записи."""
 
     genre = serializers.SlugRelatedField(
-        queryset=Genre.objects.all(), many=True, slug_field="slug",
+        queryset=Genre.objects.all(),
+        many=True,
+        slug_field="slug",
     )
     category = serializers.SlugRelatedField(
-        queryset=Category.objects.all(), slug_field="slug",
+        queryset=Category.objects.all(),
+        slug_field="slug",
     )
 
     class Meta:
@@ -140,18 +143,23 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     author = serializers.SlugRelatedField(
         slug_field="username",
-        read_only=True
+        read_only=True,
     )
 
     class Meta:
+        """Определяет настройки сериалайзера ReviewSerializer."""
+
         fields = "__all__"
         model = Review
         validators = [
             serializers.UniqueTogetherValidator(
                 queryset=Review.objects.all(),
-                fields=("author", "title",),
-                message="Можно оставить только 1 отзыв!"
-            )
+                fields=(
+                    "author",
+                    "title",
+                ),
+                message="Можно оставить только 1 отзыв!",
+            ),
         ]
 
 
@@ -160,9 +168,11 @@ class CommentSerializer(serializers.ModelSerializer):
 
     author = serializers.SlugRelatedField(
         slug_field="username",
-        read_only=True
+        read_only=True,
     )
 
     class Meta:
+        """Определяет настройки сериалайзера CommentSerializer."""
+
         fields = "__all__"
         model = Comment

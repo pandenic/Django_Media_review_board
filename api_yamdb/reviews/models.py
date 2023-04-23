@@ -34,9 +34,14 @@ class User(AbstractUser):
     )
 
     def save(self, *args, **kwargs):
+        """Переопределяет действия при сохранении записи.
+
+        Меняет поля is_admin и is_staff в зависимости
+        от поля role.
+        """
         if self.role == "admin":
             self.is_admin = True
-            self.is_staff= True
+            self.is_staff = True
         if self.role == "moderator":
             self.is_staff = True
         if self.role == "user":
@@ -47,7 +52,7 @@ class User(AbstractUser):
     class Meta:
         """Определяет настройки модели User."""
 
-        ordering = ('role', 'username')
+        ordering = ("role", "username")
 
 
 class Category(models.Model):
