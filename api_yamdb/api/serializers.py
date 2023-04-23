@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from reviews.models import Category, Genre, Title, Comment, Review
 
@@ -11,6 +12,12 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     """Сериализирует модель user."""
+
+    email = serializers.EmailField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())],
+        max_length=254,
+    )
 
     class Meta:
         """Определяет настройки сериалайзера UserSerializer."""

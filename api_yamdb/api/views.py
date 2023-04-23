@@ -14,7 +14,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.filters import TitleFilter
 from api.mixins import ListCreateDestroyViewSet
-from api.permissions import IsAdminOrReadOnly, IsAuthorOrStaffOrReadOnly
+from api.permissions import IsAdminOrReadOnly, IsAuthorOrStaffOrReadOnly, IsAdminOnly
 from api.serializers import (
     CategorySerializer,
     GenreSerializer,
@@ -40,8 +40,16 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = "username"
     filter_backends = (SearchFilter,)
     search_fields = ('username',)
+    permission_classes = (permissions.IsAuthenticated, IsAdminOnly)
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
-    @action(["get", "patch"], detail=False)
+    def get_permissions(self):
+        """Определяет permissions в зависимости от метода."""
+        if self.action == "me":
+            return [permissions.IsAuthenticated()]
+        return super().get_permissions()
+
+    @action(["get", "patch", "delete"], detail=False)
     def me(self, request):
         """Функция для обработки 'users/me' endpoint."""
         if request.method == "PATCH":
@@ -51,11 +59,12 @@ class UserViewSet(viewsets.ModelViewSet):
                 partial=True,
             )
             if serializer.is_valid():
-                serializer.save()
+                serializer.save(role=self.request.user.role)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        if request.method == "DELETE":
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
         serializer = UserSerializer(request.user)
-
         if serializer.data:
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
@@ -130,8 +139,7 @@ def sign_up(request):
     serializer = SignupSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         user, created = User.objects.get_or_create(
-            username=serializer.validated_data["username"],
-            email=serializer.validated_data["email"],
+            **serializer.validated_data,
         )
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
@@ -141,6 +149,7 @@ def sign_up(request):
             [user.email],
             fail_silently=False,
         )
+
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -165,13 +174,14 @@ class ReviewViewSet(viewsets.ModelViewSet):
             title=self.get_title()
         )
 
+
 class CommentViewSet(viewsets.ModelViewSet):
     """
     Viewset для создания и редактирования комментариев.
     """
 
     serializer_class = CommentSerializer
-    permission_classes = (IsAuthorOrStaffOrReadOnly)
+    permission_classes = (IsAuthorOrStaffOrReadOnly,)
 
     def get_review(self):
         return Review.objects.get(pk=self.kwargs.get("review_id"))

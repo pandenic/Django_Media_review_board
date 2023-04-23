@@ -8,8 +8,8 @@ from api.views import (
     GenreViewSet,
     TitleViewSet,
     ReviewViewSet,
-    CommentViewSet
-    )
+    CommentViewSet,
+)
 
 from api.views import UserViewSet, get_token, sign_up
 

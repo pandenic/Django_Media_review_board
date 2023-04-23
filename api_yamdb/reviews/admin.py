@@ -8,6 +8,7 @@ class UserAdmin(admin.ModelAdmin):
 
     list_display = (
         "username",
+        "is_admin",
         "role",
         "first_name",
         "last_name",
@@ -17,7 +18,7 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ("username", "role")
     list_filter = ("role",)
     empty_value_display = "-пусто-"
-    list_editable = ("role",)
+    list_editable = ("role", "is_admin")
 
 
 class CategoryAdmin(admin.ModelAdmin):
