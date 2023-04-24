@@ -27,6 +27,32 @@ class User(AbstractUser):
         default="user",
         choices=ROLES,
     )
+    is_admin = models.BooleanField(
+        verbose_name="Админ",
+        help_text="Определяет админ ли пользователь",
+        default=False,
+    )
+
+    def save(self, *args, **kwargs):
+        """Переопределяет действия при сохранении записи.
+
+        Меняет поля is_admin и is_staff в зависимости
+        от поля role.
+        """
+        if self.role == "admin":
+            self.is_admin = True
+            self.is_staff = True
+        if self.role == "moderator":
+            self.is_staff = True
+        if self.role == "user":
+            self.is_admin = False
+            self.is_staff = False
+        super().save(*args, **kwargs)
+
+    class Meta:
+        """Определяет настройки модели User."""
+
+        ordering = ("role", "username")
 
 
 class Category(models.Model):
@@ -198,7 +224,8 @@ class Review(models.Model):
         ],
     )
     pub_date = models.DateTimeField(
-        auto_now_add=True, verbose_name="Дата публикации отзыва",
+        auto_now_add=True,
+        verbose_name="Дата публикации отзыва",
     )
 
     class Meta:
@@ -229,21 +256,21 @@ class Comment(models.Model):
         null=True,
         verbose_name="Автор комментария",
     )
-    # Изменено название поля ниже
     review = models.ForeignKey(
         Review,
         related_name="comments",
         on_delete=models.CASCADE,
     )
     created = models.DateTimeField(
-        auto_now_add=True, verbose_name="Дата комментария",
+        auto_now_add=True,
+        verbose_name="Дата комментария",
     )
 
     class Meta:
         """Определяет настройки модели Comment."""
 
-        verbose_name = ("Комментарий",)
-        verbose_name_plural = ("Комментарии",)
+        verbose_name = "Комментарий"
+        verbose_name_plural = "Комментарии"
         ordering = ("-created",)
 
     def __str__(self) -> str:

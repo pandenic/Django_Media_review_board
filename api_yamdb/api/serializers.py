@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from reviews.models import Category, Genre, Title, Comment, Review
 
@@ -11,6 +12,12 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     """Сериализирует модель user."""
+
+    email = serializers.EmailField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())],
+        max_length=254,
+    )
 
     class Meta:
         """Определяет настройки сериалайзера UserSerializer."""
@@ -50,10 +57,13 @@ class TitleWriteSerializer(serializers.ModelSerializer):
     """Сериализатор модели Title для записи."""
 
     genre = serializers.SlugRelatedField(
-        queryset=Genre.objects.all(), many=True, slug_field="slug",
+        queryset=Genre.objects.all(),
+        many=True,
+        slug_field="slug",
     )
     category = serializers.SlugRelatedField(
-        queryset=Category.objects.all(), slug_field="slug",
+        queryset=Category.objects.all(),
+        slug_field="slug",
     )
 
     class Meta:
@@ -133,18 +143,23 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     author = serializers.SlugRelatedField(
         slug_field="username",
-        read_only=True
+        read_only=True,
     )
 
     class Meta:
+        """Определяет настройки сериалайзера ReviewSerializer."""
+
         fields = "__all__"
         model = Review
         validators = [
             serializers.UniqueTogetherValidator(
                 queryset=Review.objects.all(),
-                fields=("author", "title",),
-                message="Можно оставить только 1 отзыв!"
-            )
+                fields=(
+                    "author",
+                    "title",
+                ),
+                message="Можно оставить только 1 отзыв!",
+            ),
         ]
 
 
@@ -153,9 +168,11 @@ class CommentSerializer(serializers.ModelSerializer):
 
     author = serializers.SlugRelatedField(
         slug_field="username",
-        read_only=True
+        read_only=True,
     )
 
     class Meta:
+        """Определяет настройки сериалайзера CommentSerializer."""
+
         fields = "__all__"
         model = Comment
