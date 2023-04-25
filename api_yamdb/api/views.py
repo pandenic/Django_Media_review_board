@@ -2,14 +2,16 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
+
 from django_filters.rest_framework import DjangoFilterBackend
 
-from rest_framework.filters import SearchFilter
-from rest_framework import viewsets, status, serializers, permissions
+from rest_framework import permissions, status, serializers, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.response import Response
+from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.filters import TitleFilter
@@ -21,16 +23,16 @@ from api.permissions import (
 )
 from api.serializers import (
     CategorySerializer,
+    CommentSerializer,
     GenreSerializer,
+    GetTokenSerializer,
+    ReviewSerializer,
+    SignupSerializer,
     TitleReadSerializer,
     TitleWriteSerializer,
     UserSerializer,
-    GetTokenSerializer,
-    SignupSerializer,
-    ReviewSerializer,
-    CommentSerializer,
 )
-from reviews.models import Category, Genre, Title, Review
+from reviews.models import Category, Genre, Review, Title
 
 User = get_user_model()
 
@@ -99,7 +101,11 @@ class GenreViewSet(ListCreateDestroyViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     """Вьюсет для произведений."""
 
-    queryset = Title.objects.all().order_by("id")
+    queryset = Title.objects.annotate(
+        rating=Avg(
+            'reviews__score',
+        ),
+    ).all().order_by("id")
     serializer_class = TitleWriteSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
@@ -162,11 +168,14 @@ class ReviewViewSet(viewsets.ModelViewSet):
     """Viewset для просмотра и редактирования Отзывов."""
 
     serializer_class = ReviewSerializer
-    permission_classes = (IsAuthorOrStaffOrReadOnly,)
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+        IsAuthorOrStaffOrReadOnly,
+        )
 
     def get_title(self):
         """Определяет функцию для получения title_id из url."""
-        return Title.objects.get(pk=self.kwargs.get("title_id"))
+        return get_object_or_404(Title, pk=self.kwargs.get("title_id"))
 
     def get_queryset(self):
         """Переопределяет queryset в зависимости от title_id."""
@@ -185,19 +194,30 @@ class CommentViewSet(viewsets.ModelViewSet):
     """Viewset для создания и редактирования комментариев."""
 
     serializer_class = CommentSerializer
-    permission_classes = (IsAuthorOrStaffOrReadOnly,)
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+        IsAuthorOrStaffOrReadOnly,
+    )
 
     def get_review(self):
-        """Определяет функцию для получения review_id из url."""
-        return Review.objects.get(pk=self.kwargs.get("review_id"))
+        """Определяет функцию для получения title_id и review_id."""
+        return get_object_or_404(
+            Review,
+            id=self.kwargs.get("review_id"),
+            title__id=self.kwargs.get("title_id"),
+        )
 
     def get_queryset(self):
         """Переопределяет queryset в зависимости от review_id."""
         return self.get_review().comments.all()
 
     def perform_create(self, serializer):
-        """Переопределяет действия при создания записи.
+        """
+        Переопределяет действия при создания записи.
 
         Обновляет поля author и pk review для сохраняемой записи.
         """
-        serializer.save(author=self.request.user, pk=self.get_review())
+        serializer.save(
+            author=self.request.user,
+            review=self.get_review(),
+        )

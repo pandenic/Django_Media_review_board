@@ -5,12 +5,11 @@ from rest_framework.routers import SimpleRouter
 
 from api.views import (
     CategoryViewSet,
-    GenreViewSet,
-    TitleViewSet,
-    ReviewViewSet,
     CommentViewSet,
+    GenreViewSet,
+    ReviewViewSet,
+    TitleViewSet,
 )
-
 from api.views import UserViewSet, get_token, sign_up
 
 app_name = "api"

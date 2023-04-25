@@ -1,11 +1,12 @@
 """Модуль содержит описание serializers для приложения api."""
-from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from reviews.models import Category, Genre, Title, Comment, Review
+from reviews.models import Category, Comment, Genre, Review, Title
 
 User = get_user_model()
 
@@ -141,8 +142,7 @@ class SignupSerializer(serializers.Serializer):
 class ReviewSerializer(serializers.ModelSerializer):
     """Сериалайзер модели Review."""
 
-    author = serializers.SlugRelatedField(
-        slug_field="username",
+    author = serializers.StringRelatedField(
         read_only=True,
     )
 
@@ -151,16 +151,21 @@ class ReviewSerializer(serializers.ModelSerializer):
 
         fields = "__all__"
         model = Review
-        validators = [
-            serializers.UniqueTogetherValidator(
-                queryset=Review.objects.all(),
-                fields=(
-                    "author",
-                    "title",
-                ),
-                message="Можно оставить только 1 отзыв!",
-            ),
-        ]
+
+    def validate(self, data):
+        """Проверяет, что нельзя оставить больше одного отзыва."""
+        request = self.context["request"]
+        author = request.user
+        title_id = self.context.get("view").kwargs.get("title_id")
+        title = get_object_or_404(Title, pk=title_id)
+        if (
+            request.method == "POST"
+            and Review.objects.filter(title=title, author=author).exists()
+        ):
+            raise serializers.ValidationError(
+                "Можно написать только один отзыв!",
+            )
+        return data
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -169,6 +174,7 @@ class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         slug_field="username",
         read_only=True,
+        default=serializers.CurrentUserDefault(),
     )
 
     class Meta:
