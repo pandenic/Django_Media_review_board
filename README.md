@@ -46,6 +46,10 @@ pip install -r requirements.txt
 python manage.py makemigrations
 python manage.py migrate
 ```
+Загрузите данные из csv
+```bash
+python manage.py load_data
+```
 
 ## Команда
 

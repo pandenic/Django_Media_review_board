@@ -96,7 +96,7 @@ class Command(BaseCommand):
                 review_id=row["review_id"],
                 text=row["text"],
                 author_id=row["author"],
-                created=row["pub_date"],
+                pub_date=row["pub_date"],
             )
             comment.save()
         logger.info("Данные успешно загружены.")
