@@ -201,19 +201,19 @@ class Review(models.Model):
     )
     author = models.ForeignKey(
         User,
-        related_name="reviewer",
+        related_name="reviews",
         on_delete=models.CASCADE,
+        verbose_name="Автор отзыва",
         blank=True,
         null=True,
-        verbose_name="Автор отзыва",
     )
     title = models.ForeignKey(
         Title,
         related_name="reviews",
         on_delete=models.CASCADE,
+        verbose_name="Произведение",
         blank=True,
         null=True,
-        verbose_name="Произведение",
     )
     score = models.PositiveIntegerField(
         verbose_name="Оценка",
@@ -234,6 +234,12 @@ class Review(models.Model):
         verbose_name = "Отзыв"
         verbose_name_plural = "Отзывы"
         ordering = ("pub_date",)
+        constraints = (
+            models.UniqueConstraint(
+                fields=("title", "author"),
+                name="unique_review",
+            ),
+        )
 
     def __str__(self) -> str:
         """Определяет отображение модели Review."""
@@ -260,8 +266,10 @@ class Comment(models.Model):
         Review,
         related_name="comments",
         on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
-    created = models.DateTimeField(
+    pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Дата комментария",
     )
@@ -271,7 +279,7 @@ class Comment(models.Model):
 
         verbose_name = "Комментарий"
         verbose_name_plural = "Комментарии"
-        ordering = ("-created",)
+        ordering = ("-pub_date",)
 
     def __str__(self) -> str:
         """Определяет отображение модели Comment."""

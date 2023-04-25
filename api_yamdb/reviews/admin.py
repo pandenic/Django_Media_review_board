@@ -53,7 +53,7 @@ class CommentAdmin(admin.ModelAdmin):
         "id",
         "text",
         "author",
-        "created",
+        "pub_date",
     )
     search_fields = (
         "text",
@@ -62,7 +62,7 @@ class CommentAdmin(admin.ModelAdmin):
     list_filter = (
         "text",
         "author",
-        "created",
+        "pub_date",
     )
 
 
