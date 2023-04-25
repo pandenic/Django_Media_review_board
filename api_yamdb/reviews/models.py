@@ -79,6 +79,7 @@ class Category(models.Model):
     class Meta:
         """Определяет настройки модели Category."""
 
+        ordering = ("name",)
         verbose_name = "Категория"
         verbose_name_plural = "Категории"
 
@@ -107,6 +108,7 @@ class Genre(models.Model):
     class Meta:
         """Определяет настройки модели Genre."""
 
+        ordering = ("name",)
         verbose_name = "Жанр"
         verbose_name_plural = "Жанры"
 

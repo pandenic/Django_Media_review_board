@@ -171,7 +171,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
         IsAuthorOrStaffOrReadOnly,
-        )
+    )
 
     def get_title(self):
         """Определяет функцию для получения title_id из url."""
