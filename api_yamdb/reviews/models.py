@@ -1,19 +1,19 @@
 """Модуль содержит описание моделей для приложения review."""
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from api.errors import ErrorMessage
 from reviews.validators import validate_year
 
 
 class User(AbstractUser):
     """Описание дополнительных полей модели User."""
 
-    ROLES = (
-        ("user", "user"),
-        ("admin", "admin"),
-        ("moderator", "moderator"),
-    )
+    ROLE_USER = "user"
+    ROLE_ADMIN = "admin"
+    ROLE_MODERATOR = "moderator"
 
     bio = models.TextField(
         verbose_name="Биография",
@@ -24,14 +24,28 @@ class User(AbstractUser):
         verbose_name="Роль",
         help_text="Укажите роль пользователя",
         max_length=9,
-        default="user",
-        choices=ROLES,
+        default=ROLE_USER,
+        choices=(
+            (ROLE_USER, "user"),
+            (ROLE_ADMIN, "admin"),
+            (ROLE_MODERATOR, "moderator"),
+        ),
     )
-    is_admin = models.BooleanField(
-        verbose_name="Админ",
-        help_text="Определяет админ ли пользователь",
-        default=False,
-    )
+
+    @property
+    def is_admin(self):
+        """Проверяет админ ли пользователь."""
+        return self.role == self.ROLE_ADMIN
+
+    @property
+    def is_moderator(self):
+        """Проверяет модератор ли пользователь."""
+        return self.role == self.ROLE_MODERATOR
+
+    @property
+    def is_user(self):
+        """Проверяет обычный ли пользователь."""
+        return self.role == self.ROLE_USER
 
     def save(self, *args, **kwargs):
         """Переопределяет действия при сохранении записи.
@@ -39,13 +53,9 @@ class User(AbstractUser):
         Меняет поля is_admin и is_staff в зависимости
         от поля role.
         """
-        if self.role == "admin":
-            self.is_admin = True
+        if self.is_admin or self.is_moderator:
             self.is_staff = True
-        if self.role == "moderator":
-            self.is_staff = True
-        if self.role == "user":
-            self.is_admin = False
+        if self.is_user:
             self.is_staff = False
         super().save(*args, **kwargs)
 
@@ -53,6 +63,12 @@ class User(AbstractUser):
         """Определяет настройки модели User."""
 
         ordering = ("role", "username")
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
+
+    def __str__(self):
+        """Определяет отображение модели User."""
+        return self.username
 
 
 class Category(models.Model):
@@ -83,6 +99,10 @@ class Category(models.Model):
         verbose_name = "Категория"
         verbose_name_plural = "Категории"
 
+    def __str__(self):
+        """Определяет отображение модели Category."""
+        return self.name[:15]
+
 
 class Genre(models.Model):
     """Модель описывает жанры произведений.
@@ -112,6 +132,10 @@ class Genre(models.Model):
         verbose_name = "Жанр"
         verbose_name_plural = "Жанры"
 
+    def __str__(self):
+        """Определяет отображение модели Genre."""
+        return self.name[:15]
+
 
 class Title(models.Model):
     """Модель, описывающая произведения."""
@@ -130,11 +154,11 @@ class Title(models.Model):
         null=True,
         help_text="Добавьте описание",
     )
-    year = models.IntegerField(
+    year = models.PositiveSmallIntegerField(
         verbose_name="Год выхода",
         null=False,
         blank=False,
-        validators=[validate_year],
+        validators=(validate_year,),
         help_text="Укажите год выхода",
     )
     category = models.ForeignKey(
@@ -217,13 +241,19 @@ class Review(models.Model):
         blank=True,
         null=True,
     )
-    score = models.PositiveIntegerField(
+    score = models.PositiveSmallIntegerField(
         verbose_name="Оценка",
         help_text="Укажите оценку от 1 до 10",
-        validators=[
-            MinValueValidator(1, message="Оценка ниже допустимой!"),
-            MaxValueValidator(10, message="Оценка выше допустимой!"),
-        ],
+        validators=(
+            MinValueValidator(
+                settings.MIN_SCORE,
+                message=f"{ErrorMessage.MIN_SCORE_ERROR}{settings.MIN_SCORE}",
+            ),
+            MaxValueValidator(
+                settings.MAX_SCORE,
+                message=f"{ErrorMessage.MAX_SCORE_ERROR}{settings.MAX_SCORE}",
+            ),
+        ),
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,

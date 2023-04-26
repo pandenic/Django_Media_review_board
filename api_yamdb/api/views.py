@@ -1,6 +1,7 @@
 """Модуль содержит view для приложения api."""
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
+from django.conf import settings
 from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
@@ -32,9 +33,19 @@ from api.serializers import (
     TitleWriteSerializer,
     UserSerializer,
 )
+from api.errors import ErrorMessage
 from reviews.models import Category, Genre, Review, Title
 
 User = get_user_model()
+
+
+class HTTPMethod:
+    """Определяет HTTP методы для работы viewsets."""
+
+    GET = "get"
+    POST = "post"
+    PATCH = "patch"
+    DELETE = "delete"
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -47,15 +58,23 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter,)
     search_fields = ("username",)
     permission_classes = (permissions.IsAuthenticated, IsAdminOnly)
-    http_method_names = ["get", "post", "patch", "delete"]
+    http_method_names = (
+        HTTPMethod.GET,
+        HTTPMethod.POST,
+        HTTPMethod.PATCH,
+        HTTPMethod.DELETE,
+    )
 
     def get_permissions(self):
         """Определяет permissions в зависимости от метода."""
         if self.action == "me":
-            return [permissions.IsAuthenticated()]
+            return (permissions.IsAuthenticated(),)
         return super().get_permissions()
 
-    @action(["get", "patch", "delete"], detail=False)
+    @action(
+        (HTTPMethod.GET, HTTPMethod.PATCH, HTTPMethod.DELETE),
+        detail=False,
+    )
     def me(self, request):
         """Функция для обработки 'users/me' endpoint."""
         if request.method == "PATCH":
@@ -64,10 +83,9 @@ class UserViewSet(viewsets.ModelViewSet):
                 data=request.data,
                 partial=True,
             )
-            if serializer.is_valid():
-                serializer.save(role=self.request.user.role)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(role=self.request.user.role)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         if request.method == "DELETE":
             return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
         serializer = UserSerializer(request.user)
@@ -101,11 +119,15 @@ class GenreViewSet(ListCreateDestroyViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     """Вьюсет для произведений."""
 
-    queryset = Title.objects.annotate(
-        rating=Avg(
-            'reviews__score',
-        ),
-    ).all().order_by("id")
+    queryset = (
+        Title.objects.annotate(
+            rating=Avg(
+                "reviews__score",
+            ),
+        )
+        .all()
+        .order_by("id")
+    )
     serializer_class = TitleWriteSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
@@ -118,50 +140,50 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleWriteSerializer
 
 
-@api_view(["POST"])
-@permission_classes([permissions.AllowAny])
+@api_view(("POST",))
+@permission_classes((permissions.AllowAny,))
 def get_token(request):
     """Функция получения нового токена."""
     serializer = GetTokenSerializer(data=request.data)
-    if serializer.is_valid():
-        username = serializer.validated_data["username"]
-        user = get_object_or_404(User, username=username)
+    serializer.is_valid(raise_exception=True)
+    username = serializer.validated_data["username"]
+    user = get_object_or_404(User, username=username)
 
-        if not default_token_generator.check_token(
-            user,
-            serializer.validated_data["confirmation_code"],
-        ):
-            raise serializers.ValidationError("Invalid confirmation code")
-
-        token = RefreshToken.for_user(user)
-
-        return Response(
-            {"token": str(token.access_token)},
-            status=status.HTTP_200_OK,
+    if not default_token_generator.check_token(
+        user,
+        serializer.validated_data["confirmation_code"],
+    ):
+        raise serializers.ValidationError(
+            ErrorMessage.INVALID_CONFIRMATION_CODE_ERROR,
         )
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    token = RefreshToken.for_user(user)
+
+    return Response(
+        {"token": str(token.access_token)},
+        status=status.HTTP_200_OK,
+    )
 
 
-@api_view(["POST"])
-@permission_classes([permissions.AllowAny])
+@api_view(("POST",))
+@permission_classes((permissions.AllowAny,))
 def sign_up(request):
     """Функция регистрации и получения письма с confirmation code."""
     serializer = SignupSerializer(data=request.data)
-    if serializer.is_valid(raise_exception=True):
-        user, created = User.objects.get_or_create(
-            **serializer.validated_data,
-        )
-        confirmation_code = default_token_generator.make_token(user)
-        send_mail(
-            "yamdb код подтверждения",
-            f"Код подтверждения: {confirmation_code}",
-            "yamdb@yamdb.com",
-            [user.email],
-            fail_silently=False,
-        )
+    serializer.is_valid(raise_exception=True)
+    user, created = User.objects.get_or_create(
+        **serializer.validated_data,
+    )
+    confirmation_code = default_token_generator.make_token(user)
+    send_mail(
+        "yamdb код подтверждения",
+        f"Код подтверждения: {confirmation_code}",
+        settings.EMAIL_BACKEND,
+        (user.email,),
+        fail_silently=False,
+    )
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

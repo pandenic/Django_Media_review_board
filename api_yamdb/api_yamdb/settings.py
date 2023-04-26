@@ -129,3 +129,7 @@ SIMPLE_JWT = {
 
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+DEBUG_EMAIL = "yamdb@yamdb.com"
+
+MAX_SCORE = 10
+MIN_SCORE = 1

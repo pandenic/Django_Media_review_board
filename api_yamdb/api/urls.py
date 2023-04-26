@@ -33,7 +33,8 @@ router.register(
 )
 router.register(
     r"titles/(?P<title_id>\d+)/reviews",
-    ReviewViewSet, basename="reviews",
+    ReviewViewSet,
+    basename="reviews",
 )
 router.register(
     r"titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments",
@@ -47,4 +48,4 @@ v1 = [
     path("auth/signup/", sign_up, name="sign_up"),
 ]
 
-urlpatterns = [path("v1/", include(v1))]
+urlpatterns = (path("v1/", include(v1)),)

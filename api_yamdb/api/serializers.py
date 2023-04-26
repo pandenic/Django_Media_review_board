@@ -7,6 +7,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from reviews.models import Category, Comment, Genre, Review, Title
+from api.errors import ErrorMessage
 
 User = get_user_model()
 
@@ -16,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     email = serializers.EmailField(
         required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())],
+        validators=(UniqueValidator(queryset=User.objects.all()),),
         max_length=254,
     )
 
@@ -77,9 +78,7 @@ class TitleWriteSerializer(serializers.ModelSerializer):
         """Проверяет год при сериализации создания записи в модель Title."""
         current_year = timezone.now().year
         if data > current_year:
-            raise serializers.ValidationError(
-                "Год выпуска не может быть больше текущего.",
-            )
+            raise serializers.ValidationError(ErrorMessage.INVALID_YEAR_ERROR)
         return data
 
 
@@ -124,17 +123,17 @@ class SignupSerializer(serializers.Serializer):
         email = attrs["email"]
         if username == "me":
             raise serializers.ValidationError(
-                "Нельзя использовать me в качестве имени пользователя",
+                ErrorMessage.ME_AS_USERNAME_ERROR,
             )
         user_list = User.objects.filter(username=username)
         if user_list.exists() and user_list[0].email != email:
             raise serializers.ValidationError(
-                "Нельзя использовать существующеe имя пользователя",
+                ErrorMessage.EXISTS_EMAIL_ERROR,
             )
         user_list = User.objects.filter(email=email)
         if user_list.exists() and user_list[0].username != username:
             raise serializers.ValidationError(
-                "Нельзя использовать email существующего пользователя",
+                ErrorMessage.EXISTS_USERNAME_ERROR,
             )
         return attrs
 
@@ -163,7 +162,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             and Review.objects.filter(title=title, author=author).exists()
         ):
             raise serializers.ValidationError(
-                "Можно написать только один отзыв!",
+                ErrorMessage.ONLY_ONE_REVIEW_ERROR,
             )
         return data
 
