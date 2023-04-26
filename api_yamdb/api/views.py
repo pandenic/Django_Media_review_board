@@ -32,6 +32,7 @@ from api.serializers import (
     TitleWriteSerializer,
     UserSerializer,
 )
+from api.errors import ErrorMessage
 from reviews.models import Category, Genre, Review, Title
 
 User = get_user_model()
@@ -131,7 +132,7 @@ def get_token(request):
             user,
             serializer.validated_data["confirmation_code"],
         ):
-            raise serializers.ValidationError("Invalid confirmation code")
+            raise serializers.ValidationError(ErrorMessage.INVALID_CONFIRMATION_CODE_ERROR)
 
         token = RefreshToken.for_user(user)
 
