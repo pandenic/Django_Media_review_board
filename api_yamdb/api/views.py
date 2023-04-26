@@ -81,10 +81,9 @@ class UserViewSet(viewsets.ModelViewSet):
                 data=request.data,
                 partial=True,
             )
-            if serializer.is_valid():
-                serializer.save(role=self.request.user.role)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(role=self.request.user.role)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         if request.method == "DELETE":
             return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
         serializer = UserSerializer(request.user)
@@ -140,23 +139,22 @@ class TitleViewSet(viewsets.ModelViewSet):
 def get_token(request):
     """Функция получения нового токена."""
     serializer = GetTokenSerializer(data=request.data)
-    if serializer.is_valid():
-        username = serializer.validated_data["username"]
-        user = get_object_or_404(User, username=username)
+    serializer.is_valid(raise_exception=True)
+    username = serializer.validated_data["username"]
+    user = get_object_or_404(User, username=username)
 
-        if not default_token_generator.check_token(
-            user,
-            serializer.validated_data["confirmation_code"],
-        ):
-            raise serializers.ValidationError(ErrorMessage.INVALID_CONFIRMATION_CODE_ERROR)
+    if not default_token_generator.check_token(
+        user,
+        serializer.validated_data["confirmation_code"],
+    ):
+        raise serializers.ValidationError(ErrorMessage.INVALID_CONFIRMATION_CODE_ERROR)
 
-        token = RefreshToken.for_user(user)
+    token = RefreshToken.for_user(user)
 
-        return Response(
-            {"token": str(token.access_token)},
-            status=status.HTTP_200_OK,
-        )
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(
+        {"token": str(token.access_token)},
+        status=status.HTTP_200_OK,
+    )
 
 
 @api_view(("POST",))
@@ -164,21 +162,20 @@ def get_token(request):
 def sign_up(request):
     """Функция регистрации и получения письма с confirmation code."""
     serializer = SignupSerializer(data=request.data)
-    if serializer.is_valid(raise_exception=True):
-        user, created = User.objects.get_or_create(
-            **serializer.validated_data,
-        )
-        confirmation_code = default_token_generator.make_token(user)
-        send_mail(
-            "yamdb код подтверждения",
-            f"Код подтверждения: {confirmation_code}",
-            "yamdb@yamdb.com",
-            (user.email,),
-            fail_silently=False,
-        )
+    serializer.is_valid(raise_exception=True)
+    user, created = User.objects.get_or_create(
+        **serializer.validated_data,
+    )
+    confirmation_code = default_token_generator.make_token(user)
+    send_mail(
+        "yamdb код подтверждения",
+        f"Код подтверждения: {confirmation_code}",
+        "yamdb@yamdb.com",
+        (user.email,),
+        fail_silently=False,
+    )
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
