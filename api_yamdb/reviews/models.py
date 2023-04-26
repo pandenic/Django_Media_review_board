@@ -24,15 +24,10 @@ class User(AbstractUser):
         max_length=9,
         default=ROLE_USER,
         choices=(
-            ROLE_USER,
-            ROLE_ADMIN,
-            ROLE_MODERATOR,
+            (ROLE_USER, "user"),
+            (ROLE_ADMIN, "admin"),
+            (ROLE_MODERATOR, "moderator"),
         ),
-    )
-    is_admin = models.BooleanField(
-        verbose_name="Админ",
-        help_text="Определяет админ ли пользователь",
-        default=False,
     )
 
     def save(self, *args, **kwargs):
@@ -41,13 +36,9 @@ class User(AbstractUser):
         Меняет поля is_admin и is_staff в зависимости
         от поля role.
         """
-        if self.role == self.ROLE_ADMIN:
-            self.is_admin = True
-            self.is_staff = True
-        if self.role == self.ROLE_MODERATOR:
+        if self.role == self.ROLE_ADMIN or self.role == self.ROLE_MODERATOR:
             self.is_staff = True
         if self.role == self.ROLE_USER:
-            self.is_admin = False
             self.is_staff = False
         super().save(*args, **kwargs)
 

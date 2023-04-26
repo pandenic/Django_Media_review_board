@@ -11,7 +11,7 @@ class IsAdminOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         """Проверяет запрос на соответствие ограничениям."""
         return request.method in permissions.SAFE_METHODS or (
-            request.user.is_authenticated and request.user.is_admin
+            request.user.is_authenticated and request.user.role == request.user.ROLE_ADMIN
         )
 
 
@@ -27,7 +27,7 @@ class IsAuthorOrStaffOrReadOnly(permissions.BasePermission):
             request.method in permissions.SAFE_METHODS
             or obj.author == request.user
             or request.user.is_staff
-            or request.user.is_admin
+            or request.user.role == request.user.ROLE_ADMIN
         )
 
 
@@ -39,7 +39,7 @@ class IsAdminOnly(permissions.BasePermission):
 
     def has_permission(self, request, view):
         """Проверяет запрос на соответствие ограничениям."""
-        return request.user.is_superuser or request.user.is_admin
+        return request.user.is_superuser or request.user.role == request.user.ROLE_ADMIN
 
 
 class IsAdminUserOrReadOnly(permissions.BasePermission):
@@ -53,5 +53,5 @@ class IsAdminUserOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         if request.user.is_authenticated:
-            return request.user.is_admin
+            return request.user.role == request.user.ROLE_ADMIN
         return False
