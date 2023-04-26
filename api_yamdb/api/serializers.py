@@ -162,7 +162,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             and Review.objects.filter(title=title, author=author).exists()
         ):
             raise serializers.ValidationError(
-                "Можно написать только один отзыв!",
+                ErrorMessage.ONLY_ONE_REVIEW_ERROR,
             )
         return data
 
