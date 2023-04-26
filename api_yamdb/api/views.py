@@ -38,6 +38,13 @@ from reviews.models import Category, Genre, Review, Title
 User = get_user_model()
 
 
+class HTTPMethod:
+    GET = "get"
+    POST = "post"
+    PATCH = "patch"
+    DELETE = "delete"
+
+
 class UserViewSet(viewsets.ModelViewSet):
     """Выполняет CRUD операции для модели User."""
 
@@ -48,7 +55,12 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter,)
     search_fields = ("username",)
     permission_classes = (permissions.IsAuthenticated, IsAdminOnly)
-    http_method_names = ("get", "post", "patch", "delete")
+    http_method_names = (
+        HTTPMethod.GET,
+        HTTPMethod.POST,
+        HTTPMethod.PATCH,
+        HTTPMethod.DELETE
+    )
 
     def get_permissions(self):
         """Определяет permissions в зависимости от метода."""
@@ -56,7 +68,11 @@ class UserViewSet(viewsets.ModelViewSet):
             return (permissions.IsAuthenticated(),)
         return super().get_permissions()
 
-    @action(["get", "patch", "delete"], detail=False)
+    @action((
+            HTTPMethod.GET,
+            HTTPMethod.PATCH,
+            HTTPMethod.DELETE
+    ), detail=False)
     def me(self, request):
         """Функция для обработки 'users/me' endpoint."""
         if request.method == "PATCH":
@@ -119,8 +135,8 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleWriteSerializer
 
 
-@api_view(["POST"])
-@permission_classes([permissions.AllowAny])
+@api_view(("POST",))
+@permission_classes((permissions.AllowAny,))
 def get_token(request):
     """Функция получения нового токена."""
     serializer = GetTokenSerializer(data=request.data)
@@ -143,8 +159,8 @@ def get_token(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["POST"])
-@permission_classes([permissions.AllowAny])
+@api_view(("POST",))
+@permission_classes((permissions.AllowAny,))
 def sign_up(request):
     """Функция регистрации и получения письма с confirmation code."""
     serializer = SignupSerializer(data=request.data)
