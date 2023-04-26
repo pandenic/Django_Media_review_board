@@ -41,6 +41,7 @@ User = get_user_model()
 
 class HTTPMethod:
     """Определяет HTTP методы для работы viewsets."""
+
     GET = "get"
     POST = "post"
     PATCH = "patch"

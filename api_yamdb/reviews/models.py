@@ -30,15 +30,30 @@ class User(AbstractUser):
         ),
     )
 
+    @property
+    def is_admin(self):
+        """Проверяет админ ли пользователь."""
+        return self.role == self.ROLE_ADMIN
+
+    @property
+    def is_moderator(self):
+        """Проверяет модератор ли пользователь."""
+        return self.role == self.ROLE_MODERATOR
+
+    @property
+    def is_user(self):
+        """Проверяет обычный ли пользователь."""
+        return self.role == self.ROLE_USER
+
     def save(self, *args, **kwargs):
         """Переопределяет действия при сохранении записи.
 
         Меняет поля is_admin и is_staff в зависимости
         от поля role.
         """
-        if self.role == self.ROLE_ADMIN or self.role == self.ROLE_MODERATOR:
+        if self.is_admin or self.is_moderator:
             self.is_staff = True
-        if self.role == self.ROLE_USER:
+        if self.is_user:
             self.is_staff = False
         super().save(*args, **kwargs)
 
@@ -46,6 +61,12 @@ class User(AbstractUser):
         """Определяет настройки модели User."""
 
         ordering = ("role", "username")
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
+
+    def __str__(self):
+        """Определяет отображение модели Title."""
+        return self.username
 
 
 class Category(models.Model):

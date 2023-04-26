@@ -12,7 +12,7 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         """Проверяет запрос на соответствие ограничениям."""
         return request.method in permissions.SAFE_METHODS or (
             request.user.is_authenticated
-            and request.user.role == request.user.ROLE_ADMIN
+            and request.user.is_admin
         )
 
 
@@ -28,7 +28,7 @@ class IsAuthorOrStaffOrReadOnly(permissions.BasePermission):
             request.method in permissions.SAFE_METHODS
             or obj.author == request.user
             or request.user.is_staff
-            or request.user.role == request.user.ROLE_ADMIN
+            or request.user.is_admin
         )
 
 
@@ -42,7 +42,7 @@ class IsAdminOnly(permissions.BasePermission):
         """Проверяет запрос на соответствие ограничениям."""
         return (
             request.user.is_superuser
-            or request.user.role == request.user.ROLE_ADMIN
+            or request.user.is_admin
         )
 
 
@@ -57,5 +57,5 @@ class IsAdminUserOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         if request.user.is_authenticated:
-            return request.user.role == request.user.ROLE_ADMIN
+            return request.user.is_admin
         return False
