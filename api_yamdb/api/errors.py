@@ -14,3 +14,7 @@ class ErrorMessage:
         "Нельзя использовать email существующего пользователя."
     )
     INVALID_CONFIRMATION_CODE_ERROR = "Некорректный confirmation code."
+
+    INVALID_YEAR_ERROR = (
+        "Год выпуска не может быть больше текущего."
+    )

@@ -97,6 +97,10 @@ class Category(models.Model):
         verbose_name = "Категория"
         verbose_name_plural = "Категории"
 
+    def __str__(self):
+        """Определяет отображение модели Category."""
+        return self.name[:15]
+
 
 class Genre(models.Model):
     """Модель описывает жанры произведений.
@@ -126,6 +130,10 @@ class Genre(models.Model):
         verbose_name = "Жанр"
         verbose_name_plural = "Жанры"
 
+    def __str__(self):
+        """Определяет отображение модели Genre."""
+        return self.name[:15]
+
 
 class Title(models.Model):
     """Модель, описывающая произведения."""
@@ -144,11 +152,11 @@ class Title(models.Model):
         null=True,
         help_text="Добавьте описание",
     )
-    year = models.IntegerField(
+    year = models.PositiveSmallIntegerField(
         verbose_name="Год выхода",
         null=False,
         blank=False,
-        validators=[validate_year],
+        validators=(validate_year,),
         help_text="Укажите год выхода",
     )
     category = models.ForeignKey(
