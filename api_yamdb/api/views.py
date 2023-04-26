@@ -47,12 +47,12 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = (SearchFilter,)
     search_fields = ("username",)
     permission_classes = (permissions.IsAuthenticated, IsAdminOnly)
-    http_method_names = ["get", "post", "patch", "delete"]
+    http_method_names = ("get", "post", "patch", "delete")
 
     def get_permissions(self):
         """Определяет permissions в зависимости от метода."""
         if self.action == "me":
-            return [permissions.IsAuthenticated()]
+            return (permissions.IsAuthenticated(),)
         return super().get_permissions()
 
     @action(["get", "patch", "delete"], detail=False)
@@ -156,7 +156,7 @@ def sign_up(request):
             "yamdb код подтверждения",
             f"Код подтверждения: {confirmation_code}",
             "yamdb@yamdb.com",
-            [user.email],
+            (user.email,),
             fail_silently=False,
         )
 
