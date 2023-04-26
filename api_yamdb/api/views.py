@@ -1,6 +1,7 @@
 """Модуль содержит view для приложения api."""
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
+from django.conf import settings
 from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
@@ -39,6 +40,7 @@ User = get_user_model()
 
 
 class HTTPMethod:
+    """Определяет HTTP методы для работы viewsets."""
     GET = "get"
     POST = "post"
     PATCH = "patch"
@@ -59,7 +61,7 @@ class UserViewSet(viewsets.ModelViewSet):
         HTTPMethod.GET,
         HTTPMethod.POST,
         HTTPMethod.PATCH,
-        HTTPMethod.DELETE
+        HTTPMethod.DELETE,
     )
 
     def get_permissions(self):
@@ -68,11 +70,10 @@ class UserViewSet(viewsets.ModelViewSet):
             return (permissions.IsAuthenticated(),)
         return super().get_permissions()
 
-    @action((
-            HTTPMethod.GET,
-            HTTPMethod.PATCH,
-            HTTPMethod.DELETE
-    ), detail=False)
+    @action(
+        (HTTPMethod.GET, HTTPMethod.PATCH, HTTPMethod.DELETE),
+        detail=False,
+    )
     def me(self, request):
         """Функция для обработки 'users/me' endpoint."""
         if request.method == "PATCH":
@@ -117,11 +118,15 @@ class GenreViewSet(ListCreateDestroyViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     """Вьюсет для произведений."""
 
-    queryset = Title.objects.annotate(
-        rating=Avg(
-            'reviews__score',
-        ),
-    ).all().order_by("id")
+    queryset = (
+        Title.objects.annotate(
+            rating=Avg(
+                "reviews__score",
+            ),
+        )
+        .all()
+        .order_by("id")
+    )
     serializer_class = TitleWriteSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
@@ -147,7 +152,9 @@ def get_token(request):
         user,
         serializer.validated_data["confirmation_code"],
     ):
-        raise serializers.ValidationError(ErrorMessage.INVALID_CONFIRMATION_CODE_ERROR)
+        raise serializers.ValidationError(
+            ErrorMessage.INVALID_CONFIRMATION_CODE_ERROR,
+        )
 
     token = RefreshToken.for_user(user)
 
@@ -170,7 +177,7 @@ def sign_up(request):
     send_mail(
         "yamdb код подтверждения",
         f"Код подтверждения: {confirmation_code}",
-        "yamdb@yamdb.com",
+        settings.EMAIL_BACKEND,
         (user.email,),
         fail_silently=False,
     )
