@@ -9,11 +9,9 @@ from reviews.validators import validate_year
 class User(AbstractUser):
     """Описание дополнительных полей модели User."""
 
-    ROLES = (
-        ("user", "user"),
-        ("admin", "admin"),
-        ("moderator", "moderator"),
-    )
+    ROLE_USER = "user"
+    ROLE_ADMIN = "admin"
+    ROLE_MODERATOR = "moderator"
 
     bio = models.TextField(
         verbose_name="Биография",
@@ -24,8 +22,12 @@ class User(AbstractUser):
         verbose_name="Роль",
         help_text="Укажите роль пользователя",
         max_length=9,
-        default="user",
-        choices=ROLES,
+        default=ROLE_USER,
+        choices=(
+            ROLE_USER,
+            ROLE_ADMIN,
+            ROLE_MODERATOR,
+        ),
     )
     is_admin = models.BooleanField(
         verbose_name="Админ",
@@ -39,12 +41,12 @@ class User(AbstractUser):
         Меняет поля is_admin и is_staff в зависимости
         от поля role.
         """
-        if self.role == "admin":
+        if self.role == self.ROLE_ADMIN:
             self.is_admin = True
             self.is_staff = True
-        if self.role == "moderator":
+        if self.role == self.ROLE_MODERATOR:
             self.is_staff = True
-        if self.role == "user":
+        if self.role == self.ROLE_USER:
             self.is_admin = False
             self.is_staff = False
         super().save(*args, **kwargs)
