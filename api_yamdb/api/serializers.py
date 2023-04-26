@@ -7,6 +7,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from reviews.models import Category, Comment, Genre, Review, Title
+from api.errors import ErrorMessage
 
 User = get_user_model()
 
@@ -77,9 +78,7 @@ class TitleWriteSerializer(serializers.ModelSerializer):
         """Проверяет год при сериализации создания записи в модель Title."""
         current_year = timezone.now().year
         if data > current_year:
-            raise serializers.ValidationError(
-                "Год выпуска не может быть больше текущего.",
-            )
+            raise serializers.ValidationError(ErrorMessage.INVALID_YEAR_ERROR)
         return data
 
 
