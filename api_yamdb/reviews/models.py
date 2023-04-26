@@ -232,7 +232,7 @@ class Review(models.Model):
     score = models.PositiveSmallIntegerField(
         verbose_name="Оценка",
         help_text="Укажите оценку от 1 до 10",
-        validators=[
+        validators=(
             MinValueValidator(
                 settings.MIN_SCORE,
                 message=f"{ErrorMessage.MIN_SCORE_ERROR}{settings.MIN_SCORE}",
@@ -241,7 +241,7 @@ class Review(models.Model):
                 settings.MAX_SCORE,
                 message=f"{ErrorMessage.MAX_SCORE_ERROR}{settings.MAX_SCORE}",
             ),
-        ],
+        ),
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
