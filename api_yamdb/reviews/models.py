@@ -65,7 +65,7 @@ class User(AbstractUser):
         verbose_name_plural = "Пользователи"
 
     def __str__(self):
-        """Определяет отображение модели Title."""
+        """Определяет отображение модели User."""
         return self.username
 
 
