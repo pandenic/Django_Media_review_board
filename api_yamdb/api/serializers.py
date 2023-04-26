@@ -17,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     email = serializers.EmailField(
         required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())],
+        validators=(UniqueValidator(queryset=User.objects.all()),),
         max_length=254,
     )
 
@@ -123,17 +123,17 @@ class SignupSerializer(serializers.Serializer):
         email = attrs["email"]
         if username == "me":
             raise serializers.ValidationError(
-                "Нельзя использовать me в качестве имени пользователя",
+                ErrorMessage.ME_AS_USERNAME_ERROR,
             )
         user_list = User.objects.filter(username=username)
         if user_list.exists() and user_list[0].email != email:
             raise serializers.ValidationError(
-                "Нельзя использовать существующеe имя пользователя",
+                ErrorMessage.EXISTS_EMAIL_ERROR,
             )
         user_list = User.objects.filter(email=email)
         if user_list.exists() and user_list[0].username != username:
             raise serializers.ValidationError(
-                "Нельзя использовать email существующего пользователя",
+                ErrorMessage.EXISTS_USERNAME_ERROR,
             )
         return attrs
 
