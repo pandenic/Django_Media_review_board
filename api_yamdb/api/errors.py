@@ -14,11 +14,8 @@ class ErrorMessage:
         "Нельзя использовать email существующего пользователя."
     )
     INVALID_CONFIRMATION_CODE_ERROR = "Некорректный confirmation code."
-
     INVALID_YEAR_ERROR = (
         "Год выпуска не может быть больше текущего."
     )
-
     MAX_SCORE_ERROR = 'Максимальная оценка не может быть выше: '
-
     MIN_SCORE_ERROR = 'Минимальная оценка не может быть ниже: '
