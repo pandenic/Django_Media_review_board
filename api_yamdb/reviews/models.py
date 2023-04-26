@@ -1,8 +1,10 @@
 """Модуль содержит описание моделей для приложения review."""
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from api.errors import ErrorMessage
 from reviews.validators import validate_year
 
 
@@ -227,13 +229,19 @@ class Review(models.Model):
         blank=True,
         null=True,
     )
-    score = models.PositiveIntegerField(
+    score = models.PositiveSmallIntegerField(
         verbose_name="Оценка",
         help_text="Укажите оценку от 1 до 10",
-        validators=[
-            MinValueValidator(1, message="Оценка ниже допустимой!"),
-            MaxValueValidator(10, message="Оценка выше допустимой!"),
-        ],
+        validators=(
+            MinValueValidator(
+                settings.MIN_SCORE,
+                message=f"{ErrorMessage.MIN_SCORE_ERROR}{settings.MIN_SCORE}",
+            ),
+            MaxValueValidator(
+                settings.MAX_SCORE,
+                message=f"{ErrorMessage.MAX_SCORE_ERROR}{settings.MAX_SCORE}",
+            ),
+        ),
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
