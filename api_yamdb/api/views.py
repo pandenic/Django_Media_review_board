@@ -38,6 +38,8 @@ from reviews.models import Category, Genre, Review, Title
 
 User = get_user_model()
 
+ENDPOINT_ME = "me"
+
 
 class HTTPMethod:
     """Определяет HTTP методы для работы viewsets."""
@@ -67,7 +69,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         """Определяет permissions в зависимости от метода."""
-        if self.action == "me":
+        if self.action == ENDPOINT_ME:
             return (permissions.IsAuthenticated(),)
         return super().get_permissions()
 

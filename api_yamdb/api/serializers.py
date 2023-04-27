@@ -8,6 +8,7 @@ from rest_framework.validators import UniqueValidator
 
 from reviews.models import Category, Comment, Genre, Review, Title
 from api.errors import ErrorMessage
+from views import ENDPOINT_ME
 
 User = get_user_model()
 
@@ -121,7 +122,7 @@ class SignupSerializer(serializers.Serializer):
         """Проверяет входные данные при сериализации регистрации."""
         username = attrs["username"]
         email = attrs["email"]
-        if username == "me":
+        if username == ENDPOINT_ME:
             raise serializers.ValidationError(
                 ErrorMessage.ME_AS_USERNAME_ERROR,
             )
