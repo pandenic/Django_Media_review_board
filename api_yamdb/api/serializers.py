@@ -11,6 +11,7 @@ from api.errors import ErrorMessage
 
 User = get_user_model()
 
+ENDPOINT_ME = "me"
 
 class UserSerializer(serializers.ModelSerializer):
     """Сериализирует модель user."""
@@ -121,7 +122,7 @@ class SignupSerializer(serializers.Serializer):
         """Проверяет входные данные при сериализации регистрации."""
         username = attrs["username"]
         email = attrs["email"]
-        if username == "me":
+        if username == ENDPOINT_ME:
             raise serializers.ValidationError(
                 ErrorMessage.ME_AS_USERNAME_ERROR,
             )

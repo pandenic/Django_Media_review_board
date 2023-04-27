@@ -26,9 +26,9 @@ class User(AbstractUser):
         max_length=9,
         default=ROLE_USER,
         choices=(
-            (ROLE_USER, "user"),
-            (ROLE_ADMIN, "admin"),
-            (ROLE_MODERATOR, "moderator"),
+            (ROLE_USER, ROLE_USER),
+            (ROLE_ADMIN, ROLE_ADMIN),
+            (ROLE_MODERATOR, ROLE_MODERATOR),
         ),
     )
 
@@ -82,7 +82,7 @@ class Category(models.Model):
         null=False,
         blank=False,
         unique=True,
-        max_length=256,
+        max_length=255,
         help_text="Укажите категорию",
     )
     slug = models.SlugField(
@@ -115,7 +115,7 @@ class Genre(models.Model):
         null=False,
         blank=False,
         unique=True,
-        max_length=256,
+        max_length=255,
         help_text="Укажите жанр",
     )
     slug = models.SlugField(
@@ -145,7 +145,7 @@ class Title(models.Model):
         null=False,
         blank=False,
         unique=False,
-        max_length=256,
+        max_length=255,
         help_text="Добавьте название",
     )
     description = models.TextField(
@@ -221,7 +221,7 @@ class Review(models.Model):
     """Модель отзывов на произведения."""
 
     text = models.CharField(
-        max_length=256,
+        max_length=255,
         verbose_name="Текст отзыва",
         help_text="Введите текст отзыва",
     )
@@ -282,7 +282,7 @@ class Comment(models.Model):
     """Модель комментариев к отзывам."""
 
     text = models.CharField(
-        max_length=256,
+        max_length=255,
         verbose_name="Текст комментария",
         help_text="Текст комментария к отзывам",
     )
