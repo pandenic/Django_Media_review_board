@@ -32,13 +32,12 @@ from api.serializers import (
     TitleReadSerializer,
     TitleWriteSerializer,
     UserSerializer,
+    ENDPOINT_ME
 )
 from api.errors import ErrorMessage
 from reviews.models import Category, Genre, Review, Title
 
 User = get_user_model()
-
-ENDPOINT_ME = "me"
 
 
 class HTTPMethod:

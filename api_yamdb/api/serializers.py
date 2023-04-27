@@ -8,10 +8,10 @@ from rest_framework.validators import UniqueValidator
 
 from reviews.models import Category, Comment, Genre, Review, Title
 from api.errors import ErrorMessage
-from views import ENDPOINT_ME
 
 User = get_user_model()
 
+ENDPOINT_ME = "me"
 
 class UserSerializer(serializers.ModelSerializer):
     """Сериализирует модель user."""
