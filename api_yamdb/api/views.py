@@ -32,7 +32,7 @@ from api.serializers import (
     TitleReadSerializer,
     TitleWriteSerializer,
     UserSerializer,
-    ENDPOINT_ME
+    ENDPOINT_ME,
 )
 from api.errors import ErrorMessage
 from reviews.models import Category, Genre, Review, Title

@@ -157,14 +157,20 @@ class ReviewSerializer(serializers.ModelSerializer):
     def validate(self, data):
         """Проверяет, что нельзя оставить больше одного отзыва."""
         if data.score < settings.MIN_SCORE:
-            raise serializers.ValidationError(f"{ErrorMessage.MIN_SCORE_ERROR}{settings.MIN_SCORE}")
+            raise serializers.ValidationError(
+                f"{ErrorMessage.MIN_SCORE_ERROR}{settings.MIN_SCORE}",
+            )
         if data.score > settings.MAX_SCORE:
-            raise serializers.ValidationError(f"{ErrorMessage.MAX_SCORE_ERROR}{settings.MAX_SCORE}")
+            raise serializers.ValidationError(
+                f"{ErrorMessage.MAX_SCORE_ERROR}{settings.MAX_SCORE}",
+            )
         request = self.context["request"]
         author = request.user
         view = self.context.get("view")
         if not view:
-            raise serializers.ValidationError(ErrorMessage.NO_VIEW_IN_CONTEXT_ERROR)
+            raise serializers.ValidationError(
+                ErrorMessage.NO_VIEW_IN_CONTEXT_ERROR,
+            )
         title_id = view.kwargs.get("title_id")
 
         title = get_object_or_404(Title, pk=title_id)
