@@ -32,6 +32,7 @@ from api.serializers import (
     TitleReadSerializer,
     TitleWriteSerializer,
     UserSerializer,
+    ENDPOINT_ME,
 )
 from api.errors import ErrorMessage
 from reviews.models import Category, Genre, Review, Title
@@ -67,7 +68,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         """Определяет permissions в зависимости от метода."""
-        if self.action == "me":
+        if self.action == ENDPOINT_ME:
             return (permissions.IsAuthenticated(),)
         return super().get_permissions()
 

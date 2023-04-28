@@ -1,4 +1,5 @@
 """Модуль содержит описание serializers для приложения api."""
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -10,6 +11,8 @@ from reviews.models import Category, Comment, Genre, Review, Title
 from api.errors import ErrorMessage
 
 User = get_user_model()
+
+ENDPOINT_ME = "me"
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -121,7 +124,7 @@ class SignupSerializer(serializers.Serializer):
         """Проверяет входные данные при сериализации регистрации."""
         username = attrs["username"]
         email = attrs["email"]
-        if username == "me":
+        if username == ENDPOINT_ME:
             raise serializers.ValidationError(
                 ErrorMessage.ME_AS_USERNAME_ERROR,
             )
@@ -153,9 +156,23 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """Проверяет, что нельзя оставить больше одного отзыва."""
+        if data.score < settings.MIN_SCORE:
+            raise serializers.ValidationError(
+                f"{ErrorMessage.MIN_SCORE_ERROR}{settings.MIN_SCORE}",
+            )
+        if data.score > settings.MAX_SCORE:
+            raise serializers.ValidationError(
+                f"{ErrorMessage.MAX_SCORE_ERROR}{settings.MAX_SCORE}",
+            )
         request = self.context["request"]
         author = request.user
-        title_id = self.context.get("view").kwargs.get("title_id")
+        view = self.context.get("view")
+        if not view:
+            raise serializers.ValidationError(
+                ErrorMessage.NO_VIEW_IN_CONTEXT_ERROR,
+            )
+        title_id = view.kwargs.get("title_id")
+
         title = get_object_or_404(Title, pk=title_id)
         if (
             request.method == "POST"

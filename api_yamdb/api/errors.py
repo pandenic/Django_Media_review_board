@@ -20,3 +20,4 @@ class ErrorMessage:
     MAX_SCORE_ERROR = "Максимальная оценка не может быть выше: "
     MIN_SCORE_ERROR = "Минимальная оценка не может быть ниже: "
     ONLY_ONE_REVIEW_ERROR = "Можно написать только один отзыв!"
+    NO_VIEW_IN_CONTEXT_ERROR = "Ошибка при обработке запроса"
