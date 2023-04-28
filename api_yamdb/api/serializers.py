@@ -156,11 +156,11 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """Проверяет, что нельзя оставить больше одного отзыва."""
-        if data.score < settings.MIN_SCORE:
+        if data["score"] < settings.MIN_SCORE:
             raise serializers.ValidationError(
                 f"{ErrorMessage.MIN_SCORE_ERROR}{settings.MIN_SCORE}",
             )
-        if data.score > settings.MAX_SCORE:
+        if data["score"] > settings.MAX_SCORE:
             raise serializers.ValidationError(
                 f"{ErrorMessage.MAX_SCORE_ERROR}{settings.MAX_SCORE}",
             )
