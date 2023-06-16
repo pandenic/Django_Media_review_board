@@ -53,7 +53,7 @@ python manage.py load_data
 - ### [Andrew Istratov](https://github.com/AI-Stratov/)
 - ### [Valeriy Balashov](https://github.com/elValeron/)
 
-<br>
+---
 
 # Проект "YaMDb"
 ## Описание
