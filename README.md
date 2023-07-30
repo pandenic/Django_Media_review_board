@@ -1,18 +1,18 @@
-# Project "YaMDb"
+# Project "Media review board"
 ## Description
-The YaMDb project collects user reviews of movies, music, and books.
-The works themselves are not stored in YaMDb, you can't watch the movie here
+The media review board project collects user reviews of movies, music, and books.
+The works are not stored in a database, you can't watch the movie here
 or listen to music.
 
 
 The works are divided into categories such as "Books", "Movies" and "Music".
-Only the administrator can add works, categories and genres.
+Only the administrator can add works, categories, and genres.
 
-Grateful or indignant users leave text reviews for the works and rate them in the range from one to ten (an integer); the average works' rating is formed from user ratings.
+Grateful or indignant users leave text reviews for the works and rate them from one to ten (an integer); the average works' rating is formed from user ratings.
 A user can write only one review per work.
 Users can write comments on reviews.
 
-Only authenticated users can add reviews, comments and rate.
+Only authenticated users can add reviews, comments, and rates.
 
 The list of endpoints is specified in the redoc:
 
@@ -55,10 +55,10 @@ python manage.py load_data
 
 ---
 
-# Проект "YaMDb"
+# Проект "Media review board"
 ## Описание
-Проект YaMDb собирает отзывы пользователей на произведения. 
-Сами произведения в YaMDb не хранятся, здесь нельзя посмотреть фильм 
+Проект media review board собирает отзывы пользователей на произведения. 
+Сами произведения в базе данных не хранятся, здесь нельзя посмотреть фильм 
 или послушать музыку.
 
 
