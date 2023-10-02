@@ -80,11 +80,11 @@ python manage.py load_data
 При запуске на локальной конфигурации:
 http://localhost:8000/redoc/
 
-## Технологии в проекте
-
-- ### Django 3.2
-- ### Django REST framework 3.12.4
-- ### DRF Simple JWT 5.2.2
+| Технологии | Ссылки |
+| ---- | ---- |
+| ![git_Django](https://github.com/pandenic/Foodgram_project/assets/114985447/87a6dd6e-127f-47e7-bbd4-a6c28fcddf76) | [Django](https://www.djangoproject.com/) |
+| ![git_DRF](https://github.com/pandenic/Foodgram_project/assets/114985447/cda2c749-4c32-4857-b38a-ba37e4ec08a5) | [Django REST Framework](https://www.django-rest-framework.org/) |
+| ![git_simpleJWT](https://github.com/pandenic/Media_review_board/assets/114985447/01acc50e-04ef-4bc1-b217-ddb5826dcc7e) | [simple JWT](https://github.com/jazzband/djangorestframework-simplejwt) |
 
 ## Иструкции по запуску
 
