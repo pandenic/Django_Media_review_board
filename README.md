@@ -42,10 +42,17 @@ Make migrations
 python manage.py makemigrations
 python manage.py migrate
 ```
+
 Load data from csv
 ```bash
 python manage.py load_data
 ```
+
+Execute the command in a folder with the manage.py file:
+```
+python3 manage.py runserver
+```
+
 
 ## Team
 
@@ -103,9 +110,15 @@ pip install -r requirements.txt
 python manage.py makemigrations
 python manage.py migrate
 ```
+
 Загрузите данные из csv
 ```bash
 python manage.py load_data
+```
+
+Выполните команду из папки с файлом manage.py:
+```
+python3 manage.py runserver
 ```
 
 ## Команда
